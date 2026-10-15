@@ -343,8 +343,8 @@
                 return `
                     <label class="flex items-center gap-2 p-2 rounded-xl border text-xs font-medium cursor-pointer transition select-none ${
                         isChecked 
-                            ? 'bg-amber-50 border-amber-400 text-amber-900 shadow-2xs' 
-                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                            ? 'bg-[#3d2410] border-amber-400 text-amber-200 shadow-sm' 
+                            : 'bg-[#141218] border-[#33303a] text-[#cac4d0] hover:bg-[#24222a] hover:text-[#e6e1e5]'
                     }">
                         <input type="checkbox" data-allergen="${allergen.id}" ${isChecked ? 'checked' : ''} class="sr-only" aria-label="Alérgeno ${allergen.name}">
                         <span class="text-base leading-none">${allergen.icon}</span>
@@ -383,19 +383,19 @@
 
                 // 1. Desktop Table Row
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50/80 transition group';
+                tr.className = 'hover:bg-[#25222c]/60 transition group';
                 tr.dataset.id = ing.id;
 
                 tr.innerHTML = `
-                    <td class="py-3 pl-4 pr-2 font-mono text-xs sm:text-sm text-slate-400 text-center">${index + 1}</td>
+                    <td class="py-3 pl-4 pr-2 font-mono text-xs sm:text-sm text-[#79747e] text-center">${index + 1}</td>
                     <td class="py-3 px-3">
-                        <input type="text" data-field="name" value="${safeName}" placeholder="Nombre del ingrediente..." aria-label="Nombre del ingrediente ${index + 1}" class="w-full px-3.5 py-2.5 sm:py-3 bg-transparent hover:bg-white focus:bg-white border border-transparent hover:border-slate-200 focus:border-orange-500 rounded-xl text-sm sm:text-base font-semibold text-slate-900 focus:outline-none transition">
+                        <input type="text" data-field="name" value="${safeName}" placeholder="Nombre del ingrediente..." aria-label="Nombre del ingrediente ${index + 1}" class="w-full px-3.5 py-2.5 sm:py-3 bg-transparent hover:bg-[#141218] focus:bg-[#141218] border border-transparent hover:border-[#3e3c46] focus:border-amber-400 rounded-xl text-sm sm:text-base font-semibold text-[#f3eff4] placeholder-[#79747e] focus:outline-none transition">
                     </td>
                     <td class="py-3 px-3">
-                        <input type="number" data-field="grossQty" value="${ing.grossQty}" min="0" step="0.001" aria-label="Cantidad bruta de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-xl text-right font-mono text-sm sm:text-base font-medium focus:outline-none">
+                        <input type="number" data-field="grossQty" value="${ing.grossQty}" min="0" step="0.001" aria-label="Cantidad bruta de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base font-medium text-[#f3eff4] focus:outline-none">
                     </td>
                     <td class="py-3 px-2">
-                        <select data-field="unit" aria-label="Unidad de medida de ${labelName}" class="w-full px-2 py-2.5 sm:py-3 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-xl text-center font-mono text-sm sm:text-base font-medium focus:outline-none">
+                        <select data-field="unit" aria-label="Unidad de medida de ${labelName}" class="w-full px-2 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-center font-mono text-sm sm:text-base font-medium text-[#f3eff4] focus:outline-none">
                             <option value="kg" ${ing.unit === 'kg' ? 'selected' : ''}>kg</option>
                             <option value="g" ${ing.unit === 'g' ? 'selected' : ''}>g</option>
                             <option value="L" ${ing.unit === 'L' ? 'selected' : ''}>L</option>
@@ -405,22 +405,22 @@
                         </select>
                     </td>
                     <td class="py-3 px-3">
-                        <input type="number" data-field="wastePct" value="${ing.wastePct}" min="0" max="99" step="0.5" aria-label="Porcentaje de merma de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-xl text-right font-mono text-sm sm:text-base text-amber-700 font-medium focus:outline-none">
+                        <input type="number" data-field="wastePct" value="${ing.wastePct}" min="0" max="99" step="0.5" aria-label="Porcentaje de merma de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base text-amber-300 font-medium focus:outline-none">
                     </td>
-                    <td class="py-3 px-3 text-right font-mono text-sm sm:text-base text-slate-700 bg-slate-100/60 font-medium" data-cell="netQty">
+                    <td class="py-3 px-3 text-right font-mono text-sm sm:text-base text-[#cac4d0] bg-[#17151c] font-medium" data-cell="netQty">
                         ${formatNumber(metrics.netQty, 3)} ${ing.unit}
                     </td>
                     <td class="py-3 px-3">
-                        <input type="number" data-field="unitPrice" value="${ing.unitPrice}" min="0" step="0.01" aria-label="Precio unitario de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-xl text-right font-mono text-sm sm:text-base font-medium focus:outline-none">
+                        <input type="number" data-field="unitPrice" value="${ing.unitPrice}" min="0" step="0.01" aria-label="Precio unitario de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base font-medium text-[#f3eff4] focus:outline-none">
                     </td>
-                    <td class="py-3 px-3 text-right font-mono text-sm sm:text-base text-slate-600 font-medium" data-cell="effectiveUnitPrice">
+                    <td class="py-3 px-3 text-right font-mono text-sm sm:text-base text-[#938f99] font-medium" data-cell="effectiveUnitPrice">
                         ${formatCurrency(metrics.effectiveUnitPrice)}
                     </td>
-                    <td class="py-3 px-4 text-right font-mono text-sm sm:text-base font-bold text-slate-900 bg-orange-50/50" data-cell="totalCost">
+                    <td class="py-3 px-4 text-right font-mono text-sm sm:text-base font-bold text-amber-300 bg-[#2a1d12]/40" data-cell="totalCost">
                         ${formatCurrency(metrics.totalCost)}
                     </td>
                     <td class="py-3 pl-1 pr-4 text-center no-print">
-                        <button type="button" data-action="remove" aria-label="Eliminar ${labelName}" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition" title="Eliminar ingrediente">
+                        <button type="button" data-action="remove" aria-label="Eliminar ${labelName}" class="p-2 text-[#79747e] hover:text-rose-400 hover:bg-rose-950/40 rounded-xl transition" title="Eliminar ingrediente">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -430,31 +430,31 @@
 
                 // 2. Mobile Card Item
                 const card = document.createElement('div');
-                card.className = 'p-3.5 bg-white space-y-3';
+                card.className = 'p-3.5 bg-[#1e1b24] space-y-3';
                 card.dataset.id = ing.id;
 
                 card.innerHTML = `
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-mono text-xs font-semibold">Ingrediente #${index + 1}</span>
-                            <button type="button" data-action="remove" aria-label="Eliminar ${labelName}" class="px-2 py-1 text-xs font-medium text-rose-600 hover:bg-rose-50 active:bg-rose-100 rounded-lg transition flex items-center gap-1" title="Eliminar ingrediente">
+                            <span class="px-2 py-0.5 rounded-md bg-[#282630] text-[#cac4d0] font-mono text-xs font-semibold">Ingrediente #${index + 1}</span>
+                            <button type="button" data-action="remove" aria-label="Eliminar ${labelName}" class="px-2 py-1 text-xs font-medium text-rose-400 hover:bg-rose-950/40 active:bg-rose-900/60 rounded-lg transition flex items-center gap-1" title="Eliminar ingrediente">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                 </svg>
                                 <span>Quitar</span>
                             </button>
                         </div>
-                        <input type="text" data-field="name" value="${safeName}" placeholder="Nombre del ingrediente..." aria-label="Nombre del ingrediente ${index + 1}" class="w-full min-w-0 px-3 py-2 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none">
+                        <input type="text" data-field="name" value="${safeName}" placeholder="Nombre del ingrediente..." aria-label="Nombre del ingrediente ${index + 1}" class="w-full min-w-0 px-3 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-sm font-semibold text-[#f3eff4] focus:outline-none">
                     </div>
 
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                         <div>
-                            <label class="block text-[11px] font-semibold uppercase text-slate-500 mb-1">Cant. Bruta</label>
-                            <input type="number" data-field="grossQty" value="${ing.grossQty}" min="0" step="0.001" aria-label="Cantidad bruta" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-lg font-mono text-sm text-right focus:outline-none">
+                            <label class="block text-[11px] font-semibold uppercase text-[#938f99] mb-1">Cant. Bruta</label>
+                            <input type="number" data-field="grossQty" value="${ing.grossQty}" min="0" step="0.001" aria-label="Cantidad bruta" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-[#f3eff4] text-right focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-semibold uppercase text-slate-500 mb-1">Unidad</label>
-                            <select data-field="unit" aria-label="Unidad" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-lg font-mono text-sm text-center focus:outline-none">
+                            <label class="block text-[11px] font-semibold uppercase text-[#938f99] mb-1">Unidad</label>
+                            <select data-field="unit" aria-label="Unidad" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-[#f3eff4] text-center focus:outline-none">
                                 <option value="kg" ${ing.unit === 'kg' ? 'selected' : ''}>kg</option>
                                 <option value="g" ${ing.unit === 'g' ? 'selected' : ''}>g</option>
                                 <option value="L" ${ing.unit === 'L' ? 'selected' : ''}>L</option>
@@ -464,22 +464,22 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-semibold uppercase text-amber-700 mb-1">Merma %</label>
-                            <input type="number" data-field="wastePct" value="${ing.wastePct}" min="0" max="99" step="0.5" aria-label="Porcentaje de merma" class="w-full min-w-0 px-2.5 py-2 bg-amber-50/40 focus:bg-white border border-amber-200 focus:border-orange-500 rounded-lg font-mono text-sm text-amber-800 text-right focus:outline-none">
+                            <label class="block text-[11px] font-semibold uppercase text-amber-400 mb-1">Merma %</label>
+                            <input type="number" data-field="wastePct" value="${ing.wastePct}" min="0" max="99" step="0.5" aria-label="Porcentaje de merma" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-amber-300 text-right focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-semibold uppercase text-slate-500 mb-1">Precio / Ud</label>
-                            <input type="number" data-field="unitPrice" value="${ing.unitPrice}" min="0" step="0.01" aria-label="Precio unitario" class="w-full min-w-0 px-2.5 py-2 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-lg font-mono text-sm text-right focus:outline-none">
+                            <label class="block text-[11px] font-semibold uppercase text-[#938f99] mb-1">Precio / Ud</label>
+                            <input type="number" data-field="unitPrice" value="${ing.unitPrice}" min="0" step="0.01" aria-label="Precio unitario" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-[#f3eff4] text-right focus:outline-none">
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-100 text-xs">
-                        <div class="text-slate-500">
-                            Neto: <span class="font-mono font-semibold text-slate-800" data-cell="netQty">${formatNumber(metrics.netQty, 3)} ${ing.unit}</span>
-                            <span class="mx-1 text-slate-300">|</span>
-                            Real/Ud: <span class="font-mono text-slate-600" data-cell="effectiveUnitPrice">${formatCurrency(metrics.effectiveUnitPrice)}</span>
+                    <div class="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#2d2b35] text-xs">
+                        <div class="text-[#938f99]">
+                            Neto: <span class="font-mono font-semibold text-[#e6e1e5]" data-cell="netQty">${formatNumber(metrics.netQty, 3)} ${ing.unit}</span>
+                            <span class="mx-1 text-[#49454f]">|</span>
+                            Real/Ud: <span class="font-mono text-[#cac4d0]" data-cell="effectiveUnitPrice">${formatCurrency(metrics.effectiveUnitPrice)}</span>
                         </div>
-                        <div class="font-mono font-bold text-sm text-orange-700 bg-orange-50 border border-orange-200/60 px-2.5 py-1 rounded-lg ml-auto" data-cell="totalCost">
+                        <div class="font-mono font-bold text-sm text-amber-300 bg-[#3a2210] border border-amber-500/40 px-2.5 py-1 rounded-lg ml-auto" data-cell="totalCost">
                             ${formatCurrency(metrics.totalCost)}
                         </div>
                     </div>
@@ -571,16 +571,16 @@
             fcEl.textContent = `${formatNumber(totals.realFoodCostPct, 1)}%`;
 
             if (totals.realFoodCostPct <= totals.targetFc) {
-                fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-emerald-600';
-                fcDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+                fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-emerald-400';
+                fcDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
                 fcHint.textContent = 'Óptimo (Dentro de objetivo)';
             } else if (totals.realFoodCostPct <= totals.targetFc + 5) {
-                fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-amber-600';
-                fcDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+                fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-amber-400';
+                fcDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
                 fcHint.textContent = 'Atención (Ligeramente alto)';
             } else {
-                fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-rose-600';
-                fcDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+                fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-rose-400';
+                fcDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
                 fcHint.textContent = 'Alerta (Desviación crítica)';
             }
 
@@ -752,10 +752,10 @@
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             const bgClass = type === 'success' 
-                ? 'bg-slate-900 text-white border-violet-500' 
-                : 'bg-amber-900 text-amber-100 border-amber-500';
+                ? 'bg-[#2b2930] text-[#f3eff4] border-[#d0bcff]' 
+                : 'bg-[#382210] text-amber-100 border-amber-400';
 
-            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl border-l-4 text-xs sm:text-sm font-medium transition-all duration-300 ${bgClass}`;
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-2xl border-l-4 text-xs sm:text-sm font-medium transition-all duration-300 ${bgClass}`;
             toast.innerHTML = `
                 <span class="text-base">${type === 'success' ? '✨' : '⚠️'}</span>
                 <span>${escapeHtml(message)}</span>
