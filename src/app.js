@@ -100,8 +100,14 @@
          * Formats a number with Spanish locale formatting
          */
         function formatNumber(num, decimals = 2) {
-            if (!Number.isFinite(num)) return '0,00';
-            return num.toLocaleString('es-ES', {
+            const val = typeof num === 'number' ? num : parseFloat(num);
+            if (!Number.isFinite(val)) {
+                return (0).toLocaleString('es-ES', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                });
+            }
+            return val.toLocaleString('es-ES', {
                 minimumFractionDigits: decimals,
                 maximumFractionDigits: decimals
             });
@@ -411,7 +417,7 @@
                         ${formatNumber(metrics.netQty, 3)} ${ing.unit}
                     </td>
                     <td class="py-3 px-3">
-                        <input type="number" data-field="unitPrice" value="${ing.unitPrice}" min="0" step="0.01" aria-label="Precio unitario de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base font-medium text-[#f3eff4] focus:outline-none">
+                        <input type="number" data-field="unitPrice" value="${parseFloat(ing.unitPrice || 0).toFixed(2)}" min="0" step="0.01" aria-label="Precio unitario de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base font-medium text-[#f3eff4] focus:outline-none">
                     </td>
                     <td class="py-3 px-3 text-right font-mono text-sm sm:text-base text-[#938f99] font-medium" data-cell="effectiveUnitPrice">
                         ${formatCurrency(metrics.effectiveUnitPrice)}
@@ -469,7 +475,7 @@
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold uppercase text-[#938f99] mb-1">Precio / Ud</label>
-                            <input type="number" data-field="unitPrice" value="${ing.unitPrice}" min="0" step="0.01" aria-label="Precio unitario" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-[#f3eff4] text-right focus:outline-none">
+                            <input type="number" data-field="unitPrice" value="${parseFloat(ing.unitPrice || 0).toFixed(2)}" min="0" step="0.01" aria-label="Precio unitario" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-[#f3eff4] text-right focus:outline-none">
                         </div>
                     </div>
 
@@ -488,8 +494,9 @@
                 // Shared input handler that updates both Desktop Row and Mobile Card simultaneously
                 const bindRowEvents = (containerEl, partnerEl) => {
                     containerEl.querySelectorAll('input, select').forEach(input => {
+                        const field = input.getAttribute('data-field');
+
                         input.addEventListener('input', (e) => {
-                            const field = e.target.getAttribute('data-field');
                             const val = e.target.type === 'number' ? (parseFloat(e.target.value) || 0) : e.target.value;
                             ing[field] = val;
 
@@ -508,6 +515,18 @@
 
                             recalculateAndSync();
                         });
+
+                        // Asegurar formato con dos decimales exactos en el campo de precio al desenfocar
+                        if (field === 'unitPrice') {
+                            input.addEventListener('blur', (e) => {
+                                const formatted = (parseFloat(e.target.value) || 0).toFixed(2);
+                                e.target.value = formatted;
+                                const partnerInput = partnerEl.querySelector(`[data-field="${field}"]`);
+                                if (partnerInput && partnerInput !== e.target) {
+                                    partnerInput.value = formatted;
+                                }
+                            });
+                        }
                     });
 
                     containerEl.querySelector('[data-action="remove"]').addEventListener('click', () => {
@@ -628,7 +647,7 @@
             document.getElementById('recipePortions').value = state.recipePortions || 1;
             document.getElementById('targetFoodCost').value = state.targetFoodCost || 30;
             document.getElementById('taxRate').value = String(state.taxRate ?? 10);
-            document.getElementById('realMenuPrice').value = state.realMenuPrice || 0;
+            document.getElementById('realMenuPrice').value = parseFloat(state.realMenuPrice || 0).toFixed(2);
             document.getElementById('currencySymbol').value = state.currencySymbol || '€';
 
             document.getElementById('optIncludeYaml').checked = state.optIncludeYaml !== false;
@@ -769,6 +788,8 @@
             }, 3200);
         }
 
+        let cachedPantry = [];
+
         /**
          * Loads the external pantry from despensa.json served from origin
          */
@@ -784,7 +805,8 @@
                 }
                 const items = await response.json();
                 if (Array.isArray(items) && items.length > 0) {
-                    renderPantrySelect(items);
+                    cachedPantry = items;
+                    renderPantrySelect(cachedPantry);
                 }
             } catch (err) {
                 console.warn('No se pudo cargar despensa.json desde el origen:', err);
@@ -814,6 +836,7 @@
                 }
             });
 
+            const sym = state.currencySymbol || '€';
             const buildOption = (item) => {
                 const opt = document.createElement('option');
                 const gross = Math.max(0, parseFloat(item.grossQty) || 0.1);
@@ -824,9 +847,9 @@
 
                 opt.value = `${name}|${unit}|${gross}|${waste}|${price}`;
 
-                let label = `${name} (${formatNumber(price, 2)} €/${unit})`;
+                let label = `${name} (${formatNumber(price, 2)} ${sym}/${unit})`;
                 if (waste > 0) {
-                    label = `${name} (${formatNumber(waste, 0)}% merma · ${formatNumber(price, 2)} €/${unit})`;
+                    label = `${name} (${formatNumber(waste, 0)}% merma · ${formatNumber(price, 2)} ${sym}/${unit})`;
                 }
                 opt.textContent = label;
                 return opt;
@@ -873,7 +896,12 @@
             textInputs.forEach(id => {
                 document.getElementById(id).addEventListener('input', (e) => {
                     state[id] = e.target.value;
-                    if (id === 'currencySymbol') renderIngredientsTable();
+                    if (id === 'currencySymbol') {
+                        renderIngredientsTable();
+                        if (cachedPantry.length > 0) {
+                            renderPantrySelect(cachedPantry);
+                        }
+                    }
                     recalculateAndSync();
                 });
             });
@@ -884,6 +912,11 @@
                     state[id] = parseFloat(e.target.value) || 0;
                     recalculateAndSync();
                 });
+            });
+
+            // Formatear PVP Carta Real a dos decimales al perder el foco
+            document.getElementById('realMenuPrice').addEventListener('blur', (e) => {
+                e.target.value = (parseFloat(e.target.value) || 0).toFixed(2);
             });
 
             // Obsidian Format Checkboxes
