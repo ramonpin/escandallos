@@ -16,9 +16,11 @@ SRC_DIR = os.path.join(ROOT_DIR, "src")
 INDEX_PATH = os.path.join(SRC_DIR, "index.html")
 STYLES_PATH = os.path.join(SRC_DIR, "styles.css")
 APP_JS_PATH = os.path.join(SRC_DIR, "app.js")
-OUTPUT_HTML = os.path.join(ROOT_DIR, "generador_de_escandallos_pro_para_obsidian.html")
 DIST_DIR = os.path.join(ROOT_DIR, "dist")
 COMPILED_CSS = os.path.join(DIST_DIR, "styles.min.css")
+OUTPUT_HTML = os.path.join(DIST_DIR, "generador_de_escandallos_pro_para_obsidian.html")
+DIST_INDEX = os.path.join(DIST_DIR, "index.html")
+NOJEKYLL_PATH = os.path.join(DIST_DIR, ".nojekyll")
 
 
 def get_tailwind_cmd():
@@ -58,8 +60,8 @@ def compile_css():
 
 
 def assemble_html(css_content):
-    """Inserta CSS y JS en la plantilla HTML"""
-    print("-> Ensamblando archivo HTML autónomo...")
+    """Inserta CSS y JS en la plantilla HTML y empaqueta en dist/ para GitHub Pages"""
+    print("-> Ensamblando archivos para distribución en dist/...")
     with open(INDEX_PATH, "r", encoding="utf-8") as f:
         html = f.read()
     
@@ -75,16 +77,25 @@ def assemble_html(css_content):
     html = html.replace("/* __COMPILED_CSS__ */", css_content)
     html = html.replace("/* __APP_JS__ */", js)
 
+    os.makedirs(DIST_DIR, exist_ok=True)
+
+    # 1. Entrada principal para GitHub Pages (dist/index.html)
+    with open(DIST_INDEX, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    # 2. Archivo autónomo con nombre descriptivo (dist/generador_de_escandallos_pro_para_obsidian.html)
     with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
         f.write(html)
-    
-    # También genera index.html en la raíz para servir directamente con 'just serve'
-    root_index = os.path.join(ROOT_DIR, "index.html")
-    with open(root_index, "w", encoding="utf-8") as f:
-        f.write(html)
-    
+
+    # 3. Marcador .nojekyll para asegurar que GitHub Pages no altere ni ignore archivos
+    with open(NOJEKYLL_PATH, "w", encoding="utf-8") as f:
+        f.write("")
+
     size_kb = len(html.encode("utf-8")) / 1024
-    print(f"✓ Construcción exitosa: {os.path.basename(OUTPUT_HTML)} ({size_kb:.1f} KB)")
+    print(f"✓ Construcción exitosa en dist/:")
+    print(f"  - dist/index.html ({size_kb:.1f} KB)")
+    print(f"  - dist/generador_de_escandallos_pro_para_obsidian.html ({size_kb:.1f} KB)")
+    print(f"  - dist/.nojekyll")
 
 
 def main():

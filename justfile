@@ -18,11 +18,15 @@ check:
     @node --check src/app.js
     @echo "✓ Sintaxis de JavaScript válida."
 
-# Inicia un servidor web local en localhost (permite que el navegador use el selector de carpetas del sistema)
+# Inicia un servidor web local sirviendo la carpeta dist/
 serve port="8080":
-    @echo "Iniciando servidor local en http://localhost:{{port}}..."
-    @echo "Abre http://localhost:{{port}} en el navegador para guardar directamente en cualquier carpeta con el selector del sistema."
-    @python3 -m http.server {{port}}
+    @if [ ! -d "dist" ] || [ ! -f "dist/index.html" ]; then \
+        echo "Carpeta dist/ no encontrada. Compilando primero..."; \
+        just build; \
+    fi
+    @echo "Iniciando servidor local en http://localhost:{{port}} desde dist/..."
+    @echo "Abre http://localhost:{{port}} en el navegador para usar la aplicación."
+    @python3 -m http.server {{port}} --directory dist
 
 # Modo desarrollo: reconstruye automáticamente al modificar archivos en src/
 watch:
