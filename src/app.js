@@ -182,12 +182,12 @@
         /**
          * Calculates overall recipe financial KPIs
          */
-        function computeRecipeTotals() {
+        function computeRecipeTotals(targetState = state) {
             let totalCost = 0;
             let totalNetGrams = 0;
             let ponderableCount = 0;
 
-            const enrichedIngredients = state.ingredients.map(ing => {
+            const enrichedIngredients = (targetState.ingredients || []).map(ing => {
                 const metrics = computeIngredientMetrics(ing);
                 totalCost += metrics.totalCost;
                 totalNetGrams += metrics.netGrams;
@@ -195,10 +195,10 @@
                 return { ...ing, ...metrics };
             });
 
-            const portions = Math.max(1, parseFloat(state.recipePortions) || 1);
-            const targetFc = Math.min(99, Math.max(1, parseFloat(state.targetFoodCost) || 30));
-            const taxPct = Math.max(0, parseFloat(state.taxRate) || 0);
-            const realGrossPrice = Math.max(0, parseFloat(state.realMenuPrice) || 0);
+            const portions = Math.max(1, parseFloat(targetState.recipePortions) || 1);
+            const targetFc = Math.min(99, Math.max(1, parseFloat(targetState.targetFoodCost) || 30));
+            const taxPct = Math.max(0, parseFloat(targetState.taxRate) || 0);
+            const realGrossPrice = Math.max(0, parseFloat(targetState.realMenuPrice) || 0);
 
             const costPerPortion = totalCost / portions;
             const suggestedNetPrice = costPerPortion / (targetFc / 100);
@@ -231,17 +231,17 @@
         /**
          * Generates valid, clean Markdown optimized for Obsidian (Dataview + Callouts + Markdown Tables)
          */
-        function generateObsidianMarkdown(totals) {
-            const sym = state.currencySymbol;
+        function generateObsidianMarkdown(totals, targetState = state) {
+            const sym = targetState.currencySymbol || '€';
             const today = new Date().toISOString().split('T')[0];
-            const title = (state.recipeName || 'Escandallo Sin Título').trim();
-            const code = (state.recipeCode || 'S/C').trim();
-            const category = state.recipeCategory || 'General';
-            const chef = (state.recipeChef || 'Cocina').trim();
-            const time = state.recipeTime || 0;
+            const title = (targetState.recipeName || 'Escandallo Sin Título').trim();
+            const code = (targetState.recipeCode || 'S/C').trim();
+            const category = targetState.recipeCategory || 'General';
+            const chef = (targetState.recipeChef || 'Cocina').trim();
+            const time = targetState.recipeTime || 0;
 
             // Parse and sanitize tags into valid YAML identifiers
-            const tagsList = (state.recipeTags || 'escandallo, cocina')
+            const tagsList = (targetState.recipeTags || 'escandallo, cocina')
                 .split(',')
                 .map(t => t.trim().replace(/^#/, '').replace(/\s+/g, '-').toLowerCase())
                 .map(t => t.replace(/[^a-z0-9_\-\/]/gi, ''))
@@ -249,13 +249,13 @@
             if (tagsList.length === 0) tagsList.push('escandallo');
 
             const selectedAllergens = EU_ALLERGENS
-                .filter(a => state.allergens.includes(a.id))
+                .filter(a => (targetState.allergens || []).includes(a.id))
                 .map(a => `${a.icon} ${a.name}`);
 
             let md = '';
 
             // 1. YAML Frontmatter for Obsidian Properties & Dataview
-            if (state.optIncludeYaml) {
+            if (targetState.optIncludeYaml) {
                 md += `---\n`;
                 md += `title: "${escapeYaml(title)}"\n`;
                 md += `codigo: "${escapeYaml(code)}"\n`;
@@ -274,7 +274,7 @@
                 md += `margen_bruto_racion: ${totals.grossMarginPerPortion.toFixed(2)}\n`;
                 md += `alergenos:\n`;
                 if (selectedAllergens.length > 0) {
-                    EU_ALLERGENS.filter(a => state.allergens.includes(a.id)).forEach(a => {
+                    EU_ALLERGENS.filter(a => (targetState.allergens || []).includes(a.id)).forEach(a => {
                         md += `  - "${escapeYaml(a.name)}"\n`;
                     });
                 } else {
@@ -298,7 +298,7 @@
                 : `${formatNumber(totals.totalNetGrams / 1000, 3)} kg${hasPartialWeight ? ' *(estimación ponderable)*' : ''}`;
 
             // 3. Financial Summary Block (Callout or Standard Blockquote)
-            if (state.optIncludeCallouts) {
+            if (targetState.optIncludeCallouts) {
                 const fcStatusCallout = totals.realFoodCostPct <= totals.targetFc ? '[!success]' : '[!warning]';
                 md += `> ${fcStatusCallout} Resumen Económico y Rentabilidad (${totals.portions} raciones)\n`;
                 md += `> - **Coste Total Lote:** ${formatCurrency(totals.totalCost, sym)} *(Peso neto est.: ${weightFormatted})*\n`;
@@ -323,7 +323,7 @@
             totals.enrichedIngredients.forEach((ing, idx) => {
                 const rawName = (ing.name || 'Ingrediente sin nombre').trim();
                 const cleanForWiki = rawName.replace(/[\[\]|]/g, ' ').replace(/\s+/g, ' ').trim();
-                const displayName = state.optWikiLinks ? `[[${cleanForWiki}]]` : escapeMdCell(rawName);
+                const displayName = targetState.optWikiLinks ? `[[${cleanForWiki}]]` : escapeMdCell(rawName);
                 const weightShare = totals.totalCost > 0 ? (ing.totalCost / totals.totalCost) * 100 : 0;
 
                 md += `| ${idx + 1} | ${displayName} | ${formatNumber(ing.gross, 3)} | ${escapeMdCell(ing.unit)} | ${formatNumber(ing.waste, 1)}% | ${formatNumber(ing.netQty, 3)} | ${formatCurrency(ing.price, sym)} | ${formatCurrency(ing.effectiveUnitPrice, sym)} | **${formatCurrency(ing.totalCost, sym)}** | ${formatNumber(weightShare, 1)}% |\n`;
@@ -332,7 +332,7 @@
             md += `| | **TOTALES** | | | | **${weightFormatted}** | | | **${formatCurrency(totals.totalCost, sym)}** | **100%** |\n\n`;
 
             // 5. Allergens Section
-            if (state.optIncludeCallouts) {
+            if (targetState.optIncludeCallouts) {
                 md += `> [!danger] Alérgenos Presentes (Reglamento UE 1169/2011)\n`;
                 md += `> ${selectedAllergens.length > 0 ? selectedAllergens.join(' · ') : '✅ Sin alérgenos de declaración obligatoria en esta fórmula.'}\n\n`;
             } else {
@@ -342,20 +342,20 @@
 
             // 6. Culinary Instructions
             md += `## 👨‍🍳 Procedimiento de Elaboración (Mise en Place)\n\n`;
-            md += `${(state.recipeSteps || 'Sin instrucciones especificadas.').trim()}\n\n`;
+            md += `${(targetState.recipeSteps || 'Sin instrucciones especificadas.').trim()}\n\n`;
 
             md += `## 🎨 Acabado y Pase (Emplatado)\n\n`;
-            md += `${(state.recipePlating || 'Sin notas de emplatado.').trim()}\n\n`;
+            md += `${(targetState.recipePlating || 'Sin notas de emplatado.').trim()}\n\n`;
 
-            if ((state.recipeConservation || '').trim()) {
-                if (state.optIncludeCallouts) {
+            if ((targetState.recipeConservation || '').trim()) {
+                if (targetState.optIncludeCallouts) {
                     md += `> [!info] Conservación, Vacío y Control APPCC\n`;
-                    state.recipeConservation.trim().split('\n').forEach(line => {
+                    targetState.recipeConservation.trim().split('\n').forEach(line => {
                         md += `> ${line}\n`;
                     });
                     md += `\n`;
                 } else {
-                    md += `## ❄️ Conservación y APPCC\n\n${state.recipeConservation.trim()}\n\n`;
+                    md += `## ❄️ Conservación y APPCC\n\n${targetState.recipeConservation.trim()}\n\n`;
                 }
             }
 
@@ -882,7 +882,7 @@
 
             let realMenuPrice = yamlData.pvp_carta_real !== undefined ? parseLocaleFloat(yamlData.pvp_carta_real) : undefined;
             if (realMenuPrice === undefined) {
-                const rmpMatch = body.match(/PVP (?:Real en )?Carta:.*?\*?([0-9.,]+)/i);
+                const rmpMatch = body.match(/PVP (?:Real en Carta|Carta Real|Carta):.*?\*?([0-9.,]+)/i);
                 if (rmpMatch) realMenuPrice = parseLocaleFloat(rmpMatch[1]);
             }
 
@@ -1371,4 +1371,28 @@
             });
         }
 
-        window.addEventListener('DOMContentLoaded', initApp);
+        if (typeof window !== 'undefined') {
+            window.addEventListener('DOMContentLoaded', initApp);
+        }
+
+        if (typeof module !== 'undefined' && module.exports) {
+            module.exports = {
+                EU_ALLERGENS,
+                STORAGE_KEY,
+                generateId,
+                escapeYaml,
+                escapeMdCell,
+                escapeHtml,
+                formatNumber,
+                formatCurrency,
+                parseLocaleFloat,
+                computeIngredientMetrics,
+                computeRecipeTotals,
+                generateObsidianMarkdown,
+                parseMarkdownEscandallo,
+                getDemoState,
+                slugifyFilename,
+                getState: () => state,
+                setState: (newState) => { state = newState; }
+            };
+        }

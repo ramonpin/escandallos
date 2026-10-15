@@ -39,6 +39,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run test suite
+        run: npm test
+
       - name: Build static site
         run: python3 build.py
 

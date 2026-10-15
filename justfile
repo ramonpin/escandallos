@@ -18,6 +18,11 @@ check:
     @node --check src/app.js
     @echo "✓ Sintaxis de JavaScript válida."
 
+# Ejecuta la batería de tests unitarios y de integración
+test:
+    @echo "Ejecutando batería de tests..."
+    @node --test
+
 # Inicia un servidor web local sirviendo la carpeta dist/
 serve port="8080":
     @if [ ! -d "dist" ] || [ ! -f "dist/index.html" ]; then \

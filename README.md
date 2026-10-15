@@ -89,6 +89,7 @@ Y abre en tu navegador: [http://localhost:8080](http://localhost:8080).
 just              # Muestra las recetas disponibles
 just build        # Compila el CSS y genera los archivos en dist/
 just check        # Valida la sintaxis de JavaScript (src/app.js)
+just test         # Ejecuta la batería de tests unitarios y de integración
 just serve        # Inicia servidor local en http://localhost:8080 desde dist/
 just install      # Instala dependencias npm (Tailwind CSS v4)
 just watch        # Modo desarrollo: reconstruye al modificar archivos en src/

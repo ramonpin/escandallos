@@ -4,7 +4,8 @@
   "description": "EscandalloPro - Ficha técnica de costes y exportador a Obsidian",
   "private": true,
   "scripts": {
-    "build": "just build"
+    "build": "just build",
+    "test": "node --test"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.0.0",
