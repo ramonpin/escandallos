@@ -769,6 +769,85 @@
             }, 3200);
         }
 
+        /**
+         * Loads the external pantry from despensa.json served from origin
+         */
+        async function loadExternalPantry() {
+            const select = document.getElementById('quickIngredientSelect');
+            if (!select) return;
+
+            try {
+                // Fetch desde el mismo origen sin caché para obtener siempre los precios/insumos más recientes
+                const response = await fetch('./despensa.json', { cache: 'no-cache' });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const items = await response.json();
+                if (Array.isArray(items) && items.length > 0) {
+                    renderPantrySelect(items);
+                }
+            } catch (err) {
+                console.warn('No se pudo cargar despensa.json desde el origen:', err);
+            }
+        }
+
+        /**
+         * Renders categorized or flat pantry options in the quickIngredientSelect dropdown
+         */
+        function renderPantrySelect(items) {
+            const select = document.getElementById('quickIngredientSelect');
+            if (!select) return;
+
+            select.innerHTML = '<option value="">+ Añadir desde despensa...</option>';
+
+            const groups = {};
+            const ungrouped = [];
+
+            items.forEach(item => {
+                if (!item || !item.name) return;
+                const cat = (item.categoria || '').trim();
+                if (cat) {
+                    if (!groups[cat]) groups[cat] = [];
+                    groups[cat].push(item);
+                } else {
+                    ungrouped.push(item);
+                }
+            });
+
+            const buildOption = (item) => {
+                const opt = document.createElement('option');
+                const gross = Math.max(0, parseFloat(item.grossQty) || 0.1);
+                const waste = Math.min(99.9, Math.max(0, parseFloat(item.wastePct) || 0));
+                const price = Math.max(0, parseFloat(item.unitPrice) || 0);
+                const unit = (item.unit || 'kg').trim();
+                const name = (item.name || '').trim();
+
+                opt.value = `${name}|${unit}|${gross}|${waste}|${price}`;
+
+                let label = `${name} (${formatNumber(price, 2)} €/${unit})`;
+                if (waste > 0) {
+                    label = `${name} (${formatNumber(waste, 0)}% merma · ${formatNumber(price, 2)} €/${unit})`;
+                }
+                opt.textContent = label;
+                return opt;
+            };
+
+            // Grupos por categoría
+            Object.keys(groups).sort().forEach(catName => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = catName;
+                groups[catName].forEach(item => {
+                    optgroup.appendChild(buildOption(item));
+                });
+                select.appendChild(optgroup);
+            });
+
+            // Elementos sin categoría
+            ungrouped.forEach(item => {
+                select.appendChild(buildOption(item));
+            });
+        }
+
         function initApp() {
             // Load saved state from localStorage if available
             try {
@@ -784,6 +863,7 @@
             }
 
             populateFormInputs();
+            loadExternalPantry();
 
             // Bind Top-Level Input Listeners
             const textInputs = [

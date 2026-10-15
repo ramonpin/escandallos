@@ -1,0 +1,98 @@
+[
+  {
+    "categoria": "Grasas y Aceites",
+    "name": "Aceite de Oliva Virgen Extra",
+    "unit": "L",
+    "grossQty": 0.08,
+    "wastePct": 0,
+    "unitPrice": 9.20
+  },
+  {
+    "categoria": "Grasas y Aceites",
+    "name": "Mantequilla Extra 82% M.G.",
+    "unit": "kg",
+    "grossQty": 0.10,
+    "wastePct": 0,
+    "unitPrice": 11.50
+  },
+  {
+    "categoria": "Verduras y Hortalizas",
+    "name": "Cebolla Dulce",
+    "unit": "kg",
+    "grossQty": 0.40,
+    "wastePct": 15,
+    "unitPrice": 1.60
+  },
+  {
+    "categoria": "Verduras y Hortalizas",
+    "name": "Ajo Morado",
+    "unit": "kg",
+    "grossQty": 0.05,
+    "wastePct": 12,
+    "unitPrice": 5.80
+  },
+  {
+    "categoria": "Verduras y Hortalizas",
+    "name": "Patata Agria / Monalisa",
+    "unit": "kg",
+    "grossQty": 0.80,
+    "wastePct": 18,
+    "unitPrice": 1.40
+  },
+  {
+    "categoria": "Verduras y Hortalizas",
+    "name": "Zanahoria",
+    "unit": "kg",
+    "grossQty": 0.30,
+    "wastePct": 20,
+    "unitPrice": 1.30
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "Nata Culinaria 35% M.G.",
+    "unit": "L",
+    "grossQty": 0.25,
+    "wastePct": 0,
+    "unitPrice": 4.10
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "Queso Parmigiano Reggiano 24m",
+    "unit": "kg",
+    "grossQty": 0.15,
+    "wastePct": 5,
+    "unitPrice": 24.50
+  },
+  {
+    "categoria": "Fondos y Caldos",
+    "name": "Fondo Oscuro de Ternera",
+    "unit": "L",
+    "grossQty": 0.30,
+    "wastePct": 0,
+    "unitPrice": 6.50
+  },
+  {
+    "categoria": "Fondos y Caldos",
+    "name": "Caldo de Ave Concentrado",
+    "unit": "L",
+    "grossQty": 0.50,
+    "wastePct": 0,
+    "unitPrice": 3.80
+  },
+  {
+    "categoria": "Huevos y Proteínas",
+    "name": "Huevos Camperos M/L",
+    "unit": "ud",
+    "grossQty": 4,
+    "wastePct": 0,
+    "unitPrice": 0.28
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Sal Marina en Escamas / Pimienta",
+    "unit": "kg",
+    "grossQty": 0.02,
+    "wastePct": 0,
+    "unitPrice": 2.50
+  }
+]

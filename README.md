@@ -14,15 +14,37 @@ Wikilinks).
 ├── src/
 │   ├── index.html       # Plantilla HTML base
 │   ├── styles.css       # Configuración Tailwind CSS v4 y estilos específicos
-│   └── app.js           # Lógica JavaScript cliente (cálculos, estado, exportación)
+│   ├── app.js           # Lógica JavaScript cliente (cálculos, estado, exportación)
+│   └── despensa.json    # Despensa externa editable (insumos frecuentes, mermas, precios)
 ├── dist/                # Directorio único de distribución (generado con `just build`)
 │   ├── index.html       # Aplicación autónoma principal para GitHub Pages
 │   ├── generador_de_escandallos_pro_para_obsidian.html # Archivo descargable
+│   ├── despensa.json    # Despensa servida desde el origen para la app
 │   └── .nojekyll        # Desactiva procesamiento Jekyll en GitHub Pages
 ├── build.py             # Script de compilación y ensamblado
 ├── justfile             # Tareas y comandos de automatización (just)
 ├── package.json         # Dependencias de desarrollo (Tailwind CSS CLI)
 └── README.md            # Documentación del proyecto
+```
+
+## Despensa Externa (`despensa.json`)
+
+La aplicación carga los insumos frecuentes dinámicamente desde `despensa.json`
+en el mismo origen. No se almacena en `localStorage`, lo que te permite mantener
+y versionar en Git tu catálogo de ingredientes, precios de compra y porcentajes
+de merma habituales con categorías opcionales:
+
+```json
+[
+  {
+    "categoria": "Grasas y Aceites",
+    "name": "Aceite de Oliva Virgen Extra",
+    "unit": "L",
+    "grossQty": 0.08,
+    "wastePct": 0,
+    "unitPrice": 9.20
+  }
+]
 ```
 
 ## Despliegue en GitHub Pages

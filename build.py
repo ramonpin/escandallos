@@ -21,6 +21,8 @@ COMPILED_CSS = os.path.join(DIST_DIR, "styles.min.css")
 OUTPUT_HTML = os.path.join(DIST_DIR, "generador_de_escandallos_pro_para_obsidian.html")
 DIST_INDEX = os.path.join(DIST_DIR, "index.html")
 NOJEKYLL_PATH = os.path.join(DIST_DIR, ".nojekyll")
+SRC_PANTRY = os.path.join(SRC_DIR, "despensa.json")
+DIST_PANTRY = os.path.join(DIST_DIR, "despensa.json")
 
 
 def get_tailwind_cmd():
@@ -91,10 +93,15 @@ def assemble_html(css_content):
     with open(NOJEKYLL_PATH, "w", encoding="utf-8") as f:
         f.write("")
 
+    # 4. Copia del archivo de despensa externa para ser servido desde el origen
+    if os.path.isfile(SRC_PANTRY):
+        shutil.copy2(SRC_PANTRY, DIST_PANTRY)
+
     size_kb = len(html.encode("utf-8")) / 1024
     print(f"✓ Construcción exitosa en dist/:")
     print(f"  - dist/index.html ({size_kb:.1f} KB)")
     print(f"  - dist/generador_de_escandallos_pro_para_obsidian.html ({size_kb:.1f} KB)")
+    print(f"  - dist/despensa.json")
     print(f"  - dist/.nojekyll")
 
 
