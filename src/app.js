@@ -653,8 +653,13 @@
             const mdContent = generateObsidianMarkdown(totals);
             const filename = `${slugifyFilename(state.recipeName || 'escandallo')}.md`;
 
-            // 1. Selector de ficheros del sistema nativo (File System Access API)
-            if (typeof window.showSaveFilePicker === 'function') {
+            // La File System Access API (showSaveFilePicker) está restringida por la política de
+            // seguridad de los navegadores en URLs con protocolo "file:///". Solo se permite en
+            // orígenes seguros o locales (http://localhost o https://).
+            const isFileOrigin = window.location.protocol === 'file:' || !window.isSecureContext;
+
+            // 1. Selector de ficheros del sistema nativo (disponible en localhost / HTTPS)
+            if (!isFileOrigin && typeof window.showSaveFilePicker === 'function') {
                 try {
                     const fileHandle = await window.showSaveFilePicker({
                         suggestedName: filename,
@@ -680,7 +685,7 @@
                 }
             }
 
-            // 2. Fallback estándar para navegadores sin File System Access API
+            // 2. Fallback estándar para protocolo file:/// o navegadores sin File System Access API
             const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -691,7 +696,11 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            showToast(`Archivo "${filename}" descargado.`, 'success');
+            if (isFileOrigin) {
+                showToast(`Archivo "${filename}" descargado. (Tip: ejecuta "just serve" para abrir en localhost y poder elegir carpeta de destino con el selector del sistema).`, 'success');
+            } else {
+                showToast(`Archivo "${filename}" descargado.`, 'success');
+            }
         }
 
         /**

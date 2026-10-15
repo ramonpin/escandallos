@@ -78,6 +78,11 @@ def assemble_html(css_content):
     with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
         f.write(html)
     
+    # También genera index.html en la raíz para servir directamente con 'just serve'
+    root_index = os.path.join(ROOT_DIR, "index.html")
+    with open(root_index, "w", encoding="utf-8") as f:
+        f.write(html)
+    
     size_kb = len(html.encode("utf-8")) / 1024
     print(f"✓ Construcción exitosa: {os.path.basename(OUTPUT_HTML)} ({size_kb:.1f} KB)")
 
