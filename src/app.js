@@ -653,12 +653,32 @@
             const mdContent = generateObsidianMarkdown(totals);
             const filename = `${slugifyFilename(state.recipeName || 'escandallo')}.md`;
 
-            // La File System Access API (showSaveFilePicker) está restringida por la política de
-            // seguridad de los navegadores en URLs con protocolo "file:///". Solo se permite en
-            // orígenes seguros o locales (http://localhost o https://).
-            const isFileOrigin = window.location.protocol === 'file:' || !window.isSecureContext;
+            // 1. Si se sirve desde el servidor local (just serve), invocar /api/save para
+            // abrir el selector nativo del sistema operativo (Zenity / GTK / Tkinter).
+            if (window.location.protocol.startsWith('http')) {
+                try {
+                    const resp = await fetch('/api/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename, content: mdContent })
+                    });
+                    if (resp.ok) {
+                        const result = await resp.json();
+                        if (result.cancelled) {
+                            return; // El usuario canceló el diálogo en el sistema
+                        }
+                        if (result.ok && result.path) {
+                            showToast(`Ficha guardada con éxito en: ${result.path}`, 'success');
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    // Si el servidor local no tiene /api/save o da error de red, continuar con métodos del navegador
+                }
+            }
 
-            // 1. Selector de ficheros del sistema nativo (disponible en localhost / HTTPS)
+            // 2. File System Access API del navegador (Chrome / Edge en orígenes seguros)
+            const isFileOrigin = window.location.protocol === 'file:' || !window.isSecureContext;
             if (!isFileOrigin && typeof window.showSaveFilePicker === 'function') {
                 try {
                     const fileHandle = await window.showSaveFilePicker({
@@ -685,7 +705,7 @@
                 }
             }
 
-            // 2. Fallback estándar para protocolo file:/// o navegadores sin File System Access API
+            // 3. Fallback estándar para protocolo file:/// o navegadores sin File System Access API
             const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -697,7 +717,7 @@
             URL.revokeObjectURL(url);
 
             if (isFileOrigin) {
-                showToast(`Archivo "${filename}" descargado. (Tip: ejecuta "just serve" para abrir en localhost y poder elegir carpeta de destino con el selector del sistema).`, 'success');
+                showToast(`Archivo "${filename}" descargado. (Para seleccionar carpeta con el diálogo del sistema, ejecuta "just serve").`, 'success');
             } else {
                 showToast(`Archivo "${filename}" descargado.`, 'success');
             }
@@ -906,11 +926,13 @@
                 showToast('Formulario reiniciado para nuevo escandallo.');
             });
 
-            // Download & Copy Buttons
-            document.getElementById('btnDownloadMd')?.addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnMobileDownloadMd')?.addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnCopyMdHeader')?.addEventListener('click', copyMarkdownToClipboard);
-            document.getElementById('btnMobileCopyMd')?.addEventListener('click', copyMarkdownToClipboard);
+            // Download & Copy Buttons (direct event listeners to preserve trusted user gestures)
+            ['btnDownloadMd', 'btnDownloadMdToolbar', 'btnMobileDownloadMd'].forEach(id => {
+                document.getElementById(id)?.addEventListener('click', downloadMarkdownFile);
+            });
+            ['btnCopyMdHeader', 'btnCopyMdToolbar', 'btnMobileCopyMd'].forEach(id => {
+                document.getElementById(id)?.addEventListener('click', copyMarkdownToClipboard);
+            });
         }
 
         window.addEventListener('DOMContentLoaded', initApp);

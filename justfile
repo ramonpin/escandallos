@@ -18,11 +18,9 @@ check:
     @node --check src/app.js
     @echo "✓ Sintaxis de JavaScript válida."
 
-# Inicia un servidor web local en localhost (permite que el navegador use el selector de carpetas del sistema)
+# Inicia un servidor web local con soporte para el selector nativo de carpetas del sistema
 serve port="8080":
-    @echo "Iniciando servidor local en http://localhost:{{port}}..."
-    @echo "Abre http://localhost:{{port}} en el navegador para guardar directamente en cualquier carpeta con el selector del sistema."
-    @python3 -m http.server {{port}}
+    @./server.py {{port}}
 
 # Modo desarrollo: reconstruye automáticamente al modificar archivos en src/
 watch:

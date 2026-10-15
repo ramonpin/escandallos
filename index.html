@@ -164,13 +164,13 @@
                 </label>
             </div>
             <div class="flex items-center gap-2 ml-auto sm:ml-0">
-                <button type="button" onclick="document.getElementById('btnCopyMdHeader').click()" class="text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 font-medium border border-slate-200">
+                <button id="btnCopyMdToolbar" type="button" class="text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 font-medium border border-slate-200" title="Copiar Markdown al portapapeles">
                     <svg class="w-4 h-4 text-violet-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                     </svg>
                     <span>Copiar</span>
                 </button>
-                <button type="button" onclick="document.getElementById('btnDownloadMd').click()" class="text-xs sm:text-sm bg-violet-600 hover:bg-violet-500 active:scale-95 text-white px-4 py-2 rounded-xl shadow-md shadow-violet-600/25 transition flex items-center gap-1.5 font-semibold">
+                <button id="btnDownloadMdToolbar" type="button" class="text-xs sm:text-sm bg-violet-600 hover:bg-violet-500 active:scale-95 text-white px-4 py-2 rounded-xl shadow-md shadow-violet-600/25 transition flex items-center gap-1.5 font-semibold" title="Seleccionar carpeta de destino y guardar .md">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                     </svg>
@@ -1088,12 +1088,32 @@
             const mdContent = generateObsidianMarkdown(totals);
             const filename = `${slugifyFilename(state.recipeName || 'escandallo')}.md`;
 
-            // La File System Access API (showSaveFilePicker) está restringida por la política de
-            // seguridad de los navegadores en URLs con protocolo "file:///". Solo se permite en
-            // orígenes seguros o locales (http://localhost o https://).
-            const isFileOrigin = window.location.protocol === 'file:' || !window.isSecureContext;
+            // 1. Si se sirve desde el servidor local (just serve), invocar /api/save para
+            // abrir el selector nativo del sistema operativo (Zenity / GTK / Tkinter).
+            if (window.location.protocol.startsWith('http')) {
+                try {
+                    const resp = await fetch('/api/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename, content: mdContent })
+                    });
+                    if (resp.ok) {
+                        const result = await resp.json();
+                        if (result.cancelled) {
+                            return; // El usuario canceló el diálogo en el sistema
+                        }
+                        if (result.ok && result.path) {
+                            showToast(`Ficha guardada con éxito en: ${result.path}`, 'success');
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    // Si el servidor local no tiene /api/save o da error de red, continuar con métodos del navegador
+                }
+            }
 
-            // 1. Selector de ficheros del sistema nativo (disponible en localhost / HTTPS)
+            // 2. File System Access API del navegador (Chrome / Edge en orígenes seguros)
+            const isFileOrigin = window.location.protocol === 'file:' || !window.isSecureContext;
             if (!isFileOrigin && typeof window.showSaveFilePicker === 'function') {
                 try {
                     const fileHandle = await window.showSaveFilePicker({
@@ -1120,7 +1140,7 @@
                 }
             }
 
-            // 2. Fallback estándar para protocolo file:/// o navegadores sin File System Access API
+            // 3. Fallback estándar para protocolo file:/// o navegadores sin File System Access API
             const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1132,7 +1152,7 @@
             URL.revokeObjectURL(url);
 
             if (isFileOrigin) {
-                showToast(`Archivo "${filename}" descargado. (Tip: ejecuta "just serve" para abrir en localhost y poder elegir carpeta de destino con el selector del sistema).`, 'success');
+                showToast(`Archivo "${filename}" descargado. (Para seleccionar carpeta con el diálogo del sistema, ejecuta "just serve").`, 'success');
             } else {
                 showToast(`Archivo "${filename}" descargado.`, 'success');
             }
@@ -1341,11 +1361,13 @@
                 showToast('Formulario reiniciado para nuevo escandallo.');
             });
 
-            // Download & Copy Buttons
-            document.getElementById('btnDownloadMd')?.addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnMobileDownloadMd')?.addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnCopyMdHeader')?.addEventListener('click', copyMarkdownToClipboard);
-            document.getElementById('btnMobileCopyMd')?.addEventListener('click', copyMarkdownToClipboard);
+            // Download & Copy Buttons (direct event listeners to preserve trusted user gestures)
+            ['btnDownloadMd', 'btnDownloadMdToolbar', 'btnMobileDownloadMd'].forEach(id => {
+                document.getElementById(id)?.addEventListener('click', downloadMarkdownFile);
+            });
+            ['btnCopyMdHeader', 'btnCopyMdToolbar', 'btnMobileCopyMd'].forEach(id => {
+                document.getElementById(id)?.addEventListener('click', copyMarkdownToClipboard);
+            });
         }
 
         window.addEventListener('DOMContentLoaded', initApp);

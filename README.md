@@ -13,6 +13,7 @@ Wikilinks).
 │   ├── styles.css       # Configuración Tailwind CSS v4 y estilos específicos
 │   └── app.js           # Lógica JavaScript cliente (cálculos, estado, exportación)
 ├── build.py             # Script de construcción y ensamblado
+├── server.py            # Servidor local con API para selector nativo de carpetas (Zenity)
 ├── justfile             # Tareas y comandos de construcción (just)
 ├── package.json         # Dependencias de desarrollo (Tailwind CSS CLI)
 ├── index.html           # Punto de entrada local para servidores web
@@ -21,25 +22,35 @@ Wikilinks).
 
 ## Guardado y Selector de Carpetas del Sistema
 
-Por políticas de seguridad de los navegadores (W3C File System Access API), la
-función `showSaveFilePicker()` que permite elegir la carpeta de destino en el
-diálogo del sistema solo está permitida en orígenes seguros (`http://localhost`
-o `https://`), y está bloqueada en URLs con protocolo `file:///`.
+En los navegadores web modernos existen dos limitaciones al intentar forzar el
+selector de carpetas desde el frontend:
 
-- **En localhost:** Al pulsar "Guardar .md en Carpeta...", el navegador abre el
-  diálogo nativo del sistema para elegir la carpeta de destino (ej. tu bóveda de
-  Obsidian).
-- **En `file:///`:** El archivo se descarga automáticamente en tu carpeta de
-  Descargas habitual mediante el mecanismo estándar, sin mostrar errores de
-  permisos.
+1. En **`file:///`**, los navegadores bloquean el acceso al sistema de archivos
+   por seguridad.
+2. En navegadores como **Firefox** o en peticiones **HTTP** no seguras, la API
+   experimental `showSaveFilePicker()` no está implementada o está
+   deshabilitada.
 
-Para utilizar el selector de carpetas en desarrollo local:
+Para garantizar que el selector de carpetas funcione siempre de forma nativa en
+Linux:
+
+- **Con `just serve`:** El servidor Python incluye el endpoint `/api/save` que
+  invoca **Zenity** (el selector nativo GTK de GNOME/Linux). Al pulsar «Guardar
+  en Carpeta...», se abre la ventana nativa del sistema para elegir la carpeta y
+  guardar directamente en tu bóveda de Obsidian.
+- **Sin servidor (`file:///`):** El archivo se descarga automáticamente en la
+  carpeta de Descargas mediante el estándar del navegador, sin generar errores
+  de permisos.
+
+### Uso recomendado
 
 ```bash
 just serve
 ```
 
-Y abre en tu navegador: [http://localhost:8080](http://localhost:8080).
+Abre **[http://localhost:8080](http://localhost:8080)** en tu navegador. Al
+pulsar **«Guardar en Carpeta...»**, se abrirá la ventana del explorador de
+archivos del sistema.
 
 ## Comandos disponibles (Just)
 
@@ -47,7 +58,7 @@ Y abre en tu navegador: [http://localhost:8080](http://localhost:8080).
 just              # Muestra las recetas disponibles
 just build        # Compila el CSS y genera el archivo final autónomo
 just check        # Valida la sintaxis de JavaScript (src/app.js)
-just serve        # Inicia servidor local en http://localhost:8080 (permite elegir carpeta)
+just serve        # Inicia servidor local en http://localhost:8080 con selector nativo
 just install      # Instala dependencias npm (Tailwind CSS v4)
 just watch        # Modo desarrollo: reconstruye al modificar archivos en src/
 just clean        # Limpia archivos temporales de compilación (dist/)
