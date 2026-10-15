@@ -697,7 +697,7 @@
             URL.revokeObjectURL(url);
 
             if (isFileOrigin) {
-                showToast(`Archivo "${filename}" descargado. (Tip: ejecuta "just serve" para abrir en localhost y poder elegir carpeta de destino con el selector del sistema).`, 'success');
+                showToast(`Archivo "${filename}" descargado. (Bajo HTTPS o en Chromium podrás elegir carpeta con el selector del sistema).`, 'success');
             } else {
                 showToast(`Archivo "${filename}" descargado.`, 'success');
             }
@@ -906,11 +906,13 @@
                 showToast('Formulario reiniciado para nuevo escandallo.');
             });
 
-            // Download & Copy Buttons
-            document.getElementById('btnDownloadMd')?.addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnMobileDownloadMd')?.addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnCopyMdHeader')?.addEventListener('click', copyMarkdownToClipboard);
-            document.getElementById('btnMobileCopyMd')?.addEventListener('click', copyMarkdownToClipboard);
+            // Download & Copy Buttons (direct event listeners to preserve trusted user gestures)
+            ['btnDownloadMd', 'btnDownloadMdToolbar', 'btnMobileDownloadMd'].forEach(id => {
+                document.getElementById(id)?.addEventListener('click', downloadMarkdownFile);
+            });
+            ['btnCopyMdHeader', 'btnCopyMdToolbar', 'btnMobileCopyMd'].forEach(id => {
+                document.getElementById(id)?.addEventListener('click', copyMarkdownToClipboard);
+            });
         }
 
         window.addEventListener('DOMContentLoaded', initApp);

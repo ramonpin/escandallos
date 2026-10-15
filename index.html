@@ -164,13 +164,13 @@
                 </label>
             </div>
             <div class="flex items-center gap-2 ml-auto sm:ml-0">
-                <button type="button" onclick="document.getElementById('btnCopyMdHeader').click()" class="text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 font-medium border border-slate-200">
+                <button id="btnCopyMdToolbar" type="button" class="text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 font-medium border border-slate-200" title="Copiar Markdown al portapapeles">
                     <svg class="w-4 h-4 text-violet-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                     </svg>
                     <span>Copiar</span>
                 </button>
-                <button type="button" onclick="document.getElementById('btnDownloadMd').click()" class="text-xs sm:text-sm bg-violet-600 hover:bg-violet-500 active:scale-95 text-white px-4 py-2 rounded-xl shadow-md shadow-violet-600/25 transition flex items-center gap-1.5 font-semibold">
+                <button id="btnDownloadMdToolbar" type="button" class="text-xs sm:text-sm bg-violet-600 hover:bg-violet-500 active:scale-95 text-white px-4 py-2 rounded-xl shadow-md shadow-violet-600/25 transition flex items-center gap-1.5 font-semibold" title="Seleccionar carpeta de destino y guardar .md">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                     </svg>
@@ -1132,7 +1132,7 @@
             URL.revokeObjectURL(url);
 
             if (isFileOrigin) {
-                showToast(`Archivo "${filename}" descargado. (Tip: ejecuta "just serve" para abrir en localhost y poder elegir carpeta de destino con el selector del sistema).`, 'success');
+                showToast(`Archivo "${filename}" descargado. (Bajo HTTPS o en Chromium podrás elegir carpeta con el selector del sistema).`, 'success');
             } else {
                 showToast(`Archivo "${filename}" descargado.`, 'success');
             }
@@ -1341,11 +1341,13 @@
                 showToast('Formulario reiniciado para nuevo escandallo.');
             });
 
-            // Download & Copy Buttons
-            document.getElementById('btnDownloadMd')?.addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnMobileDownloadMd')?.addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnCopyMdHeader')?.addEventListener('click', copyMarkdownToClipboard);
-            document.getElementById('btnMobileCopyMd')?.addEventListener('click', copyMarkdownToClipboard);
+            // Download & Copy Buttons (direct event listeners to preserve trusted user gestures)
+            ['btnDownloadMd', 'btnDownloadMdToolbar', 'btnMobileDownloadMd'].forEach(id => {
+                document.getElementById(id)?.addEventListener('click', downloadMarkdownFile);
+            });
+            ['btnCopyMdHeader', 'btnCopyMdToolbar', 'btnMobileCopyMd'].forEach(id => {
+                document.getElementById(id)?.addEventListener('click', copyMarkdownToClipboard);
+            });
         }
 
         window.addEventListener('DOMContentLoaded', initApp);
