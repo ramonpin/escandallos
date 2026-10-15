@@ -1,0 +1,13 @@
+{
+  "name": "escandallopro",
+  "version": "1.0.0",
+  "description": "EscandalloPro - Ficha técnica de costes y exportador a Obsidian",
+  "private": true,
+  "scripts": {
+    "build": "just build"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.0.0",
+    "tailwindcss": "^4.0.0"
+  }
+}

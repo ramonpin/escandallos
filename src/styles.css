@@ -1,0 +1,83 @@
+@import "tailwindcss";
+@source "./index.html";
+@source "./app.js";
+
+@theme {
+  --color-obsidian: #7C3AED;
+  --color-obsidian-dark: #5B21B6;
+  --color-obsidian-light: #EDE9FE;
+  --color-culinary-50: #fdf8f6;
+  --color-culinary-100: #f2e8e5;
+  --color-culinary-500: #0f172a;
+  --color-culinary-600: #ea580c;
+  --color-culinary-700: #c2410c;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Custom Scrollbar for Markdown Preview */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Remove number input arrows for cleaner table density */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Prevent iOS auto-zoom on focus by ensuring 16px font-size on mobile inputs */
+@media (max-width: 767px) {
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Prevent any horizontal page overflow on mobile viewports */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Impresión limpia y profesional para partida de cocina */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    .print-shadow-none {
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    main {
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+    .xl\:col-span-8 {
+        grid-column: span 12 / span 12 !important;
+        width: 100% !important;
+    }
+    input, select, textarea {
+        border-color: #cbd5e1 !important;
+        background: transparent !important;
+    }
+}

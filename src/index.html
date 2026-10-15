@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EscandalloPro | Gestión Culinaria &amp; Exportación a Obsidian</title>
+    <!-- Tipografías con fuentes de respaldo del sistema para soporte offline total -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+    /* __COMPILED_CSS__ */
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col selection:bg-violet-200 selection:text-violet-900">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md no-print w-full">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div class="bg-gradient-to-br from-orange-500 to-amber-600 p-1.5 sm:p-2 rounded-xl shadow-inner flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        <h1 class="font-bold text-sm sm:text-lg tracking-tight leading-none truncate">Escandallo<span class="text-orange-400">Pro</span></h1>
+                        <span class="text-[9px] sm:text-[11px] font-mono uppercase tracking-wider bg-violet-600/30 text-violet-300 border border-violet-500/40 px-1.5 sm:px-2 py-0.5 rounded-full shrink-0">Obsidian</span>
+                    </div>
+                    <p class="text-xs text-slate-400 hidden md:block mt-0.5 truncate">Sistema técnico de control de costes, mermas y fichas de producción</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <button id="btnLoadDemo" type="button" class="text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 p-2 sm:px-3 sm:py-2 rounded-xl transition flex items-center gap-1.5 font-medium" title="Cargar receta de ejemplo profesional" aria-label="Cargar receta de ejemplo profesional">
+                    <svg class="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                    </svg>
+                    <span class="hidden lg:inline">Cargar Demo</span>
+                </button>
+
+                <button id="btnClearAll" type="button" class="text-xs sm:text-sm bg-slate-800 hover:bg-rose-950/60 hover:text-rose-200 hover:border-rose-800 active:scale-95 text-slate-300 border border-slate-700 p-2 sm:px-3 sm:py-2 rounded-xl transition flex items-center gap-1.5 font-medium" title="Vaciar formulario para nuevo escandallo" aria-label="Vaciar formulario">
+                    <svg class="w-4 h-4 text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    <span class="hidden lg:inline">Limpiar</span>
+                </button>
+
+                <button id="btnCopyMdHeader" type="button" class="hidden sm:flex text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 px-3 py-2 rounded-xl transition items-center gap-1.5 font-medium" title="Copiar Markdown para Obsidian" aria-label="Copiar Markdown">
+                    <svg class="w-4 h-4 text-violet-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                    </svg>
+                    <span class="hidden md:inline">Copiar MD</span>
+                </button>
+
+                <button id="btnDownloadMd" type="button" class="hidden sm:flex text-xs sm:text-sm bg-violet-600 hover:bg-violet-500 active:scale-95 text-white px-3 sm:px-4 py-2 rounded-xl shadow-lg shadow-violet-600/30 transition items-center gap-1.5 font-semibold" title="Descargar archivo Markdown para Obsidian" aria-label="Descargar archivo Markdown">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    <span>Descargar .md</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-36 md:pb-8 space-y-5 sm:space-y-6">
+
+        <!-- KPI Financial Summary Cards -->
+        <section aria-label="Indicadores clave de rendimiento económico" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5 sm:gap-4">
+            <!-- Coste Total -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                <div class="flex items-center justify-between text-slate-500 text-[11px] sm:text-xs font-medium uppercase tracking-wider">
+                    <span>Coste Receta</span>
+                    <span class="p-1 sm:p-1.5 bg-slate-100 text-slate-600 rounded-lg">Σ</span>
+                </div>
+                <div class="mt-1.5 sm:mt-2">
+                    <p id="kpiTotalCost" class="text-lg sm:text-2xl font-bold font-mono text-slate-900">0,00 €</p>
+                    <p id="kpiTotalWeight" class="text-[11px] text-slate-400 mt-0.5 truncate" title="">Peso neto est.: 0 g</p>
+                </div>
+            </div>
+
+            <!-- Coste por Ración -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                <div class="flex items-center justify-between text-slate-500 text-[11px] sm:text-xs font-medium uppercase tracking-wider">
+                    <span>Coste / Ración</span>
+                    <span class="p-1 sm:p-1.5 bg-orange-50 text-orange-600 rounded-lg font-mono text-xs">1/n</span>
+                </div>
+                <div class="mt-1.5 sm:mt-2">
+                    <p id="kpiPortionCost" class="text-lg sm:text-2xl font-bold font-mono text-orange-600">0,00 €</p>
+                    <p id="kpiPortionsLabel" class="text-[11px] text-slate-400 mt-0.5 truncate">Para 4 raciones</p>
+                </div>
+            </div>
+
+            <!-- PVP Sugerido (Sin IVA) -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                <div class="flex items-center justify-between text-slate-500 text-[11px] sm:text-xs font-medium uppercase tracking-wider">
+                    <span>Precio Neto Sug.</span>
+                    <span class="p-1 sm:p-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-mono">Base</span>
+                </div>
+                <div class="mt-1.5 sm:mt-2">
+                    <p id="kpiSuggestedNet" class="text-lg sm:text-2xl font-bold font-mono text-slate-800">0,00 €</p>
+                    <p id="kpiTargetFcLabel" class="text-[11px] text-slate-400 mt-0.5 truncate">Según Food Cost 30%</p>
+                </div>
+            </div>
+
+            <!-- PVP Recomendado (Con IVA) -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-violet-200 bg-gradient-to-br from-white to-violet-50/40 flex flex-col justify-between">
+                <div class="flex items-center justify-between text-violet-700 text-[11px] sm:text-xs font-semibold uppercase tracking-wider">
+                    <span>PVP Carta Sug.</span>
+                    <span id="kpiTaxBadge" class="px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded-md text-[10px] font-mono">+10% IVA</span>
+                </div>
+                <div class="mt-1.5 sm:mt-2">
+                    <p id="kpiSuggestedGross" class="text-lg sm:text-2xl font-bold font-mono text-violet-700">0,00 €</p>
+                    <p class="text-[11px] text-violet-500 mt-0.5 truncate">Precio final cliente rec.</p>
+                </div>
+            </div>
+
+            <!-- Food Cost Real -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                <div class="flex items-center justify-between text-slate-500 text-[11px] sm:text-xs font-medium uppercase tracking-wider">
+                    <span>Food Cost Real</span>
+                    <span id="kpiFcStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                </div>
+                <div class="mt-1.5 sm:mt-2">
+                    <p id="kpiRealFoodCost" class="text-lg sm:text-2xl font-bold font-mono text-emerald-600">0,0%</p>
+                    <p id="kpiRealFcHint" class="text-[11px] text-slate-400 mt-0.5 truncate">Sobre PVP Real sin IVA</p>
+                </div>
+            </div>
+
+            <!-- Margen Bruto por Ración -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                <div class="flex items-center justify-between text-slate-500 text-[11px] sm:text-xs font-medium uppercase tracking-wider">
+                    <span>Margen Bruto</span>
+                    <span class="p-1 sm:p-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-mono">€</span>
+                </div>
+                <div class="mt-1.5 sm:mt-2">
+                    <p id="kpiGrossMargin" class="text-lg sm:text-2xl font-bold font-mono text-emerald-700">0,00 €</p>
+                    <p id="kpiTotalBatchMargin" class="text-[11px] text-slate-400 mt-0.5 truncate">Lote total: 0,00 €</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Workspace Layout -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+
+            <!-- Left Column: Forms & Ingredients Table (8 cols on extra-large screens) -->
+            <div class="xl:col-span-8 space-y-5 sm:space-y-6">
+
+                <!-- 1. Datos Generales y Parámetros Financieros -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden print-shadow-none">
+                    <div class="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-slate-100 bg-slate-50/60 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-slate-900 text-white text-xs font-bold flex items-center justify-center shrink-0">1</span>
+                            <h2 class="font-semibold text-sm sm:text-base text-slate-800">Ficha Técnica y Parámetros de Venta</h2>
+                        </div>
+                        <span class="text-[11px] text-slate-400 hidden sm:inline">Autoguardado local activo</span>
+                    </div>
+
+                    <div class="p-4 sm:p-5 space-y-4 sm:space-y-5">
+                        <!-- Row 1: Recipe Name, Code, Category -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 sm:gap-4">
+                            <div class="sm:col-span-12 md:col-span-6">
+                                <label for="recipeName" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Nombre del Plato / Elaboración *</label>
+                                <input type="text" id="recipeName" placeholder="Ej: Carrillera Ibérica al Oporto..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition font-medium text-slate-900">
+                            </div>
+                            <div class="sm:col-span-6 md:col-span-3">
+                                <label for="recipeCode" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Código Interno</label>
+                                <input type="text" id="recipeCode" placeholder="ESC-2026-01" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition">
+                            </div>
+                            <div class="sm:col-span-6 md:col-span-3">
+                                <label for="recipeCategory" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Partida / Categoría</label>
+                                <select id="recipeCategory" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition">
+                                    <option value="Entrante Frío">Entrante Frío</option>
+                                    <option value="Entrante Caliente">Entrante Caliente</option>
+                                    <option value="Plato Principal - Carnes">Principal - Carnes</option>
+                                    <option value="Plato Principal - Pescados">Principal - Pescados</option>
+                                    <option value="Arroces y Pastas">Arroces y Pastas</option>
+                                    <option value="Postre / Pastelería">Postre / Pastelería</option>
+                                    <option value="Sub-receta / Base">Sub-receta / Fondo / Base</option>
+                                    <option value="Menú Degustación">Menú Degustación</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Author, Prep Time, Obsidian Tags -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 sm:gap-4">
+                            <div class="sm:col-span-6 md:col-span-3">
+                                <label for="recipeChef" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Chef / Responsable</label>
+                                <input type="text" id="recipeChef" placeholder="Chef Ejecutivo" class="w-full px-3.5 py-2.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition">
+                            </div>
+                            <div class="sm:col-span-6 md:col-span-3">
+                                <label for="recipeTime" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Tiempo Prod. (min)</label>
+                                <input type="number" id="recipeTime" min="0" step="1" placeholder="45" class="w-full px-3.5 py-2.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition">
+                            </div>
+                            <div class="sm:col-span-12 md:col-span-6">
+                                <label for="recipeTags" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Etiquetas Obsidian (separadas por coma)</label>
+                                <input type="text" id="recipeTags" placeholder="escandallo, carta-otono, carnes, produccion" class="w-full px-3.5 py-2.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono text-violet-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500 transition">
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Financial Controls Box -->
+                        <div class="p-3.5 sm:p-4 rounded-xl bg-slate-900 text-white grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+                            <div>
+                                <label for="recipePortions" class="block text-[11px] font-medium text-slate-300 uppercase tracking-wider mb-1">Nº Raciones</label>
+                                <input type="number" id="recipePortions" min="1" step="1" value="4" class="w-full px-3 py-2 sm:py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm font-mono text-white focus:outline-none focus:border-orange-400">
+                            </div>
+                            <div>
+                                <label for="targetFoodCost" class="block text-[11px] font-medium text-slate-300 uppercase tracking-wider mb-1">Food Cost Obj. %</label>
+                                <input type="number" id="targetFoodCost" min="1" max="99" step="0.5" value="28" class="w-full px-3 py-2 sm:py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm font-mono text-orange-300 focus:outline-none focus:border-orange-400">
+                            </div>
+                            <div>
+                                <label for="taxRate" class="block text-[11px] font-medium text-slate-300 uppercase tracking-wider mb-1">IVA Aplicable</label>
+                                <select id="taxRate" class="w-full px-3 py-2 sm:py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm font-mono text-white focus:outline-none focus:border-orange-400">
+                                    <option value="10">10% (Hostelería)</option>
+                                    <option value="21">21% (General)</option>
+                                    <option value="4">4% (Superred.)</option>
+                                    <option value="0">0% (Exento)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="realMenuPrice" class="block text-[11px] font-medium text-violet-300 uppercase tracking-wider mb-1" title="Precio final de venta en carta con IVA incluido">PVP Carta Real</label>
+                                <input type="number" id="realMenuPrice" min="0" step="0.10" value="22.50" class="w-full px-3 py-2 sm:py-1.5 bg-violet-950/80 border border-violet-500/50 rounded-lg text-sm font-mono text-violet-200 font-semibold focus:outline-none focus:border-violet-400">
+                            </div>
+                            <div class="col-span-2 sm:col-span-1">
+                                <label for="currencySymbol" class="block text-[11px] font-medium text-slate-300 uppercase tracking-wider mb-1">Divisa</label>
+                                <select id="currencySymbol" class="w-full px-3 py-2 sm:py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm font-mono text-white focus:outline-none focus:border-orange-400">
+                                    <option value="€">EUR (€)</option>
+                                    <option value="$">USD / MXN ($)</option>
+                                    <option value="£">GBP (£)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Desglose de Ingredientes y Mermas (Adaptativo: Tarjetas en Móvil/Tablet Vertical, Tabla en Escritorio) -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden print-shadow-none">
+                    <div class="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-slate-100 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-start sm:items-center gap-2.5">
+                            <span class="w-6 h-6 rounded-lg bg-slate-900 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">2</span>
+                            <div class="min-w-0">
+                                <h2 class="font-semibold text-sm sm:text-base text-slate-800">Matriz de Ingredientes, Pesos y Mermas</h2>
+                                <p class="text-[11px] sm:text-xs text-slate-500 break-words">Fórmula: <span class="font-mono text-slate-700">Peso Neto = Peso Bruto × (1 - %Merma/100)</span></p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:flex items-center gap-2 w-full sm:w-auto no-print">
+                            <!-- Quick Add Common Ingredient Dropdown -->
+                            <select id="quickIngredientSelect" class="w-full sm:w-auto min-w-0 truncate text-xs bg-white border border-slate-200 rounded-xl px-3 py-2.5 sm:py-2 text-slate-700 focus:outline-none focus:border-orange-500" aria-label="Añadir insumo rápido frecuente">
+                                <option value="">+ Añadir insumo rápido...</option>
+                                <option value="Aceite de Oliva Virgen Extra|L|0.08|0|9.20">AOVE (9,20 €/L)</option>
+                                <option value="Mantequilla Extra 82% M.G.|kg|0.10|0|11.50">Mantequilla (11,50 €/kg)</option>
+                                <option value="Cebolla Dulce|kg|0.40|15|1.60">Cebolla (15% merma)</option>
+                                <option value="Ajo Morado|kg|0.05|12|5.80">Ajo Morado (12% merma)</option>
+                                <option value="Patata Agria|kg|0.80|18|1.40">Patata Agria (18% merma)</option>
+                                <option value="Nata Culinaria 35% M.G.|L|0.25|0|4.10">Nata 35% (4,10 €/L)</option>
+                                <option value="Fondo Oscuro de Ternera|L|0.30|0|6.50">Fondo Oscuro (6,50 €/L)</option>
+                                <option value="Huevos Camperos M/L|ud|4|0|0.28">Huevos Camperos (0,28 €/ud)</option>
+                                <option value="Sal Marina / Pimienta|kg|0.02|0|2.50">Sal y Pimienta (2,50 €/kg)</option>
+                            </select>
+
+                            <button id="btnAddIngredient" type="button" class="w-full sm:w-auto bg-orange-600 hover:bg-orange-500 active:scale-95 text-white text-xs font-semibold px-3.5 py-2.5 sm:py-2 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 shrink-0" aria-label="Añadir línea en blanco de ingrediente">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                <span>Añadir Línea en Blanco</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mobile & Tablet Portrait Card List (Visible on < md screens) -->
+                    <div id="ingredientsMobileList" class="md:hidden divide-y divide-slate-200/80 bg-slate-50/40">
+                        <!-- Dynamic mobile cards rendered via JS -->
+                    </div>
+
+                    <!-- Desktop & Tablet Landscape Table (Visible on >= md screens) -->
+                    <div class="hidden md:block overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 bg-slate-50/90 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                                    <th class="py-3 pl-4 pr-2 w-8">#</th>
+                                    <th class="py-3 px-2 min-w-[180px]">Ingrediente / Producto</th>
+                                    <th class="py-3 px-2 w-24 text-right" title="Cantidad total comprada o empleada antes de limpiar">Cant. Bruta</th>
+                                    <th class="py-3 px-2 w-20 text-center">Unidad</th>
+                                    <th class="py-3 px-2 w-20 text-right" title="Porcentaje de desperdicio al limpiar o pelar">Merma %</th>
+                                    <th class="py-3 px-2 w-24 text-right bg-slate-100/70" title="Cantidad útil real tras aplicar la merma">Cant. Neta</th>
+                                    <th class="py-3 px-2 w-28 text-right" title="Precio de compra por cada unidad (kg, L, ud...)">Precio / Ud</th>
+                                    <th class="py-3 px-2 w-24 text-right" title="Precio real del ingrediente una vez descontada la merma">Coste Real/Ud</th>
+                                    <th class="py-3 px-3 w-28 text-right bg-orange-50/50 text-orange-900">Coste Total</th>
+                                    <th class="py-3 pl-1 pr-3 w-10 text-center no-print"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="ingredientsTableBody" class="divide-y divide-slate-100 text-sm">
+                                <!-- Dynamic rows rendered via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Shared Summary Footer for Both Mobile and Desktop -->
+                    <div class="bg-slate-50 border-t-2 border-slate-200 px-4 sm:px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="uppercase tracking-wider font-semibold text-slate-500">Peso Neto Total:</span>
+                            <span id="tableTotalNetWeight" class="font-mono font-bold text-slate-800 bg-slate-200/70 px-2.5 py-1 rounded-lg">0,000 kg</span>
+                        </div>
+                        <div class="flex items-center gap-3 ml-auto">
+                            <span class="text-slate-500 font-medium">Suma Materia Prima:</span>
+                            <span id="tableTotalCost" class="font-mono text-base sm:text-lg font-bold text-orange-600 bg-orange-100/70 px-3 py-1 rounded-xl border border-orange-200">0,00 €</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Alérgenos, Elaboración y Emplatado -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden print-shadow-none">
+                    <div class="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-slate-900 text-white text-xs font-bold flex items-center justify-center shrink-0">3</span>
+                            <h2 class="font-semibold text-sm sm:text-base text-slate-800">Elaboración, Emplatado y Alérgenos (UE 1169/2011)</h2>
+                        </div>
+                    </div>
+
+                    <div class="p-4 sm:p-5 space-y-5">
+                        <!-- Allergens Checkboxes -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2.5">Declaración de Alérgenos Presentes (Toca para activar)</label>
+                            <div id="allergensContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Preparation & Plating Textareas -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="recipeSteps" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Paso a Paso / Mise en Place</label>
+                                <textarea id="recipeSteps" rows="6" placeholder="1. Limpiar las carrilleras retirando la telilla exterior...&#10;2. Salpimentar y sellar a fuego fuerte en rondeau..." class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition leading-relaxed"></textarea>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="recipePlating" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Acabado, Emplatado y Vajilla</label>
+                                    <textarea id="recipePlating" rows="3" placeholder="En plato hondo precalentado, disponer una base de parmentier en el centro, colocar 2 piezas glaseadas..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition leading-relaxed"></textarea>
+                                </div>
+                                <div>
+                                    <label for="recipeConservation" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Conservación / Caducidad / Notas APPCC</label>
+                                    <textarea id="recipeConservation" rows="2" placeholder="Abatir a +3°C en menos de 90 min. Envasar al vacío al 99%. Caducidad: 12 días en cámara a 2°C." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition leading-relaxed"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Live Obsidian Preview & Export Options (Hidden on Print) -->
+            <aside id="obsidianPreviewSection" class="no-print xl:col-span-4 space-y-6 xl:sticky xl:top-20 min-w-0 max-w-full">
+                <div class="bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-800 overflow-hidden flex flex-col max-w-full">
+                    <!-- Header -->
+                    <div class="p-3.5 sm:p-4 border-b border-slate-800 bg-slate-950/50 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-3 h-3 rounded-full bg-violet-500 ring-4 ring-violet-500/20 shrink-0"></div>
+                            <div class="min-w-0">
+                                <h3 class="font-semibold text-xs sm:text-sm text-white truncate">Vista Previa Obsidian (.md)</h3>
+                                <p id="previewFilename" class="text-[11px] font-mono text-violet-400 truncate">escandallo.md</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700 shrink-0">YAML + Callouts</span>
+                    </div>
+
+                    <!-- Obsidian Formatting Toggles -->
+                    <div class="px-3.5 sm:px-4 py-2.5 bg-slate-800/60 border-b border-slate-800 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-300">
+                        <label class="flex items-center gap-2 cursor-pointer select-none py-0.5">
+                            <input type="checkbox" id="optIncludeYaml" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-slate-700 border-slate-600">
+                            <span>Frontmatter YAML</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none py-0.5">
+                            <input type="checkbox" id="optIncludeCallouts" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-slate-700 border-slate-600">
+                            <span>Callouts (&gt; [!info])</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none py-0.5">
+                            <input type="checkbox" id="optWikiLinks" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-slate-700 border-slate-600">
+                            <span>[[WikiLinks]] Insumos</span>
+                        </label>
+                    </div>
+
+                    <!-- Markdown Code Output -->
+                    <div class="relative group w-full overflow-hidden">
+                        <pre id="markdownPreview" class="p-3.5 sm:p-4 text-xs font-mono text-slate-200 bg-slate-950/90 overflow-x-auto overflow-y-auto max-h-[320px] sm:max-h-[460px] w-full max-w-full leading-relaxed whitespace-pre-wrap break-words select-all"></pre>
+                    </div>
+
+                    <!-- Export Footer Buttons -->
+                    <div class="p-3.5 sm:p-4 bg-slate-900 border-t border-slate-800 space-y-2.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <button id="btnCopyMdSidebar" type="button" class="w-full py-3 sm:py-2.5 px-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-100 rounded-xl font-medium text-xs transition flex items-center justify-center gap-2 border border-slate-700" title="Copiar Markdown al portapapeles" aria-label="Copiar al Portapapeles">
+                                <svg class="w-4 h-4 text-violet-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                <span>Copiar al Portapapeles</span>
+                            </button>
+
+                            <button id="btnDownloadMdSidebar" type="button" class="w-full py-3 sm:py-2.5 px-3 bg-violet-600 hover:bg-violet-500 active:scale-95 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-violet-600/25" title="Descargar como archivo .md para tu bóveda" aria-label="Descargar Archivo .md">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                <span>Descargar Archivo .md</span>
+                            </button>
+                        </div>
+                        <p class="text-[11px] text-slate-400 text-center leading-relaxed px-2">
+                            Compatible con el plugin <span class="text-violet-300 font-mono">Dataview</span> de Obsidian mediante propiedades YAML estandarizadas.
+                        </p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Mobile Floating Bottom Action Dock -->
+    <nav aria-label="Acciones rápidas móviles" class="md:hidden fixed bottom-14 inset-x-3 z-40 bg-slate-900/95 backdrop-blur-md border border-slate-700/90 rounded-2xl p-2 flex items-center justify-between gap-2 no-print shadow-2xl">
+        <button id="btnMobileAddIng" type="button" class="flex-1 min-w-0 py-2.5 px-2 bg-orange-600 active:bg-orange-500 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm" aria-label="Añadir insumo">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span class="truncate">Insumo</span>
+        </button>
+        <button id="btnMobileCopyMd" type="button" class="flex-1 min-w-0 py-2.5 px-2 bg-slate-800 active:bg-slate-700 text-slate-100 border border-slate-700 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5" aria-label="Copiar Markdown">
+            <svg class="w-4 h-4 text-violet-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <span class="truncate">Copiar MD</span>
+        </button>
+        <button id="btnMobileDownloadMd" type="button" class="flex-1 min-w-0 py-2.5 px-2 bg-violet-600 active:bg-violet-500 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm" aria-label="Descargar archivo Markdown">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            <span class="truncate">Bajar .md</span>
+        </button>
+    </nav>
+
+    <!-- Non-intrusive Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-32 md:bottom-5 right-3 sm:right-5 left-3 sm:left-auto z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Custom Confirmation Modal for Clearing Data (No window.confirm) -->
+    <div id="clearModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 text-base">¿Reiniciar escandallo actual?</h3>
+                    <p class="text-xs text-slate-500">Se vaciarán todos los ingredientes y notas para empezar una ficha desde cero.</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2.5 pt-2">
+                <button id="btnCancelClear" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
+                <button id="btnConfirmClear" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-sm transition">Sí, vaciar ficha</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+    /* __APP_JS__ */
+    </script>
+</body>
+</html>
