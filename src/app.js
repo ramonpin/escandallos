@@ -118,6 +118,29 @@
         }
 
         /**
+         * Parses a numeric value from Spanish or standard locale string safely
+         */
+        function parseLocaleFloat(val) {
+            if (typeof val === 'number') return Number.isFinite(val) ? val : 0;
+            if (!val) return 0;
+            let s = String(val).trim().replace(/[^0-9.,\-]/g, '');
+            if (!s) return 0;
+            const hasComma = s.includes(',');
+            const hasDot = s.includes('.');
+            if (hasComma && hasDot) {
+                if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
+                    s = s.replace(/\./g, '').replace(',', '.');
+                } else {
+                    s = s.replace(/,/g, '');
+                }
+            } else if (hasComma) {
+                s = s.replace(',', '.');
+            }
+            const num = parseFloat(s);
+            return Number.isFinite(num) ? num : 0;
+        }
+
+        /**
          * Calculates individual ingredient row metrics:
          * - Net Quantity = Gross Quantity * (1 - Waste% / 100)
          * - Line Cost = Gross Quantity * Unit Purchase Price
@@ -660,6 +683,9 @@
 
             renderAllergens();
             renderIngredientsTable();
+            if (cachedPantry && cachedPantry.length > 0) {
+                renderPantrySelect(cachedPantry);
+            }
             recalculateAndSync();
         }
 
@@ -762,6 +788,320 @@
             } finally {
                 document.body.removeChild(textarea);
             }
+        }
+
+        /**
+         * Parses an exported Obsidian Markdown escandallo file and converts it into application state
+         */
+        function parseMarkdownEscandallo(content) {
+            if (!content || typeof content !== 'string') return null;
+
+            let frontmatter = null;
+            let body = content;
+
+            const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+            const hasYaml = !!fmMatch;
+            const yamlData = {};
+
+            if (fmMatch) {
+                frontmatter = fmMatch[1];
+                body = content.slice(fmMatch[0].length);
+
+                const lines = frontmatter.split(/\r?\n/);
+                let currentKey = null;
+
+                lines.forEach(line => {
+                    const listMatch = line.match(/^\s*-\s+(.*)$/);
+                    if (listMatch && currentKey) {
+                        let val = listMatch[1].trim();
+                        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+                            val = val.slice(1, -1);
+                        }
+                        if (!Array.isArray(yamlData[currentKey])) yamlData[currentKey] = [];
+                        yamlData[currentKey].push(val);
+                        return;
+                    }
+
+                    const kvMatch = line.match(/^([a-z0-9_]+)\s*:\s*(.*)$/i);
+                    if (kvMatch) {
+                        currentKey = kvMatch[1].trim();
+                        let val = kvMatch[2].trim();
+                        if (val === '') {
+                            yamlData[currentKey] = [];
+                        } else {
+                            if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+                                val = val.slice(1, -1);
+                            }
+                            yamlData[currentKey] = val;
+                        }
+                    }
+                });
+            }
+
+            // Extracción de título de la receta
+            let recipeName = yamlData.title;
+            if (!recipeName) {
+                const titleMatch = body.match(/^#\s*(?:🍽️\s*)?(.*?)$/m);
+                if (titleMatch) recipeName = titleMatch[1].trim();
+            }
+
+            // Metadatos generales
+            let recipeCode = yamlData.codigo;
+            let recipeCategory = yamlData.categoria;
+            let recipeChef = yamlData.responsable;
+            let recipeTime = yamlData.tiempo_min !== undefined ? parseInt(yamlData.tiempo_min, 10) : undefined;
+
+            const codeMatch = body.match(/\*\*Código:\*\*\s*`?([^`|\n]+)`?/i);
+            if (!recipeCode && codeMatch) recipeCode = codeMatch[1].trim();
+
+            const catMatch = body.match(/\*\*Partida:\*\*\s*([^|\n]+)/i);
+            if (!recipeCategory && catMatch) recipeCategory = catMatch[1].trim();
+
+            const chefMatch = body.match(/\*\*Responsable:\*\*\s*([^|\n]+)/i);
+            if (!recipeChef && chefMatch) recipeChef = chefMatch[1].trim();
+
+            const timeMatch = body.match(/\*\*Tiempo:\*\*\s*(\d+)/i);
+            if (recipeTime === undefined && timeMatch) recipeTime = parseInt(timeMatch[1], 10);
+
+            // Parámetros de escandallo y costes
+            let recipePortions = yamlData.raciones !== undefined ? parseInt(yamlData.raciones, 10) : undefined;
+            if (recipePortions === undefined) {
+                const portionsMatch = body.match(/Resumen Económico.*?\((\d+)\s*raciones\)/i);
+                if (portionsMatch) recipePortions = parseInt(portionsMatch[1], 10);
+            }
+
+            let targetFoodCost = yamlData.food_cost_objetivo !== undefined ? parseLocaleFloat(yamlData.food_cost_objetivo) : undefined;
+            if (targetFoodCost === undefined) {
+                const fcMatch = body.match(/(?:Food Cost|FC)\s*(\d+(?:[.,]\d+)?)\s*%/i);
+                if (fcMatch) targetFoodCost = parseLocaleFloat(fcMatch[1]);
+            }
+
+            let taxRate = undefined;
+            const taxMatch = body.match(/\+(\d+(?:[.,]\d+)?)\s*%\s*IVA/i);
+            if (taxMatch) taxRate = parseLocaleFloat(taxMatch[1]);
+
+            let realMenuPrice = yamlData.pvp_carta_real !== undefined ? parseLocaleFloat(yamlData.pvp_carta_real) : undefined;
+            if (realMenuPrice === undefined) {
+                const rmpMatch = body.match(/PVP (?:Real en )?Carta:.*?\*?([0-9.,]+)/i);
+                if (rmpMatch) realMenuPrice = parseLocaleFloat(rmpMatch[1]);
+            }
+
+            // Etiquetas
+            let recipeTags = undefined;
+            if (Array.isArray(yamlData.tags) && yamlData.tags.length > 0) {
+                recipeTags = yamlData.tags.join(', ');
+            }
+
+            // Tabla de ingredientes
+            const ingredients = [];
+            const lines = body.split(/\r?\n/);
+            let inTable = false;
+            let detectedCurrency = null;
+            let hasWikiLinks = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line.startsWith('|')) {
+                    if (inTable && ingredients.length > 0) inTable = false;
+                    continue;
+                }
+
+                const rawCells = line.split('|').map(c => c.trim());
+                const row = rawCells.filter((_, idx) => idx > 0 && idx < rawCells.length - 1);
+                if (row.length < 8) continue;
+
+                if (row[0].includes('---') || row[1].toLowerCase().includes('ingrediente')) {
+                    inTable = true;
+                    continue;
+                }
+
+                if (row.some(c => c.toUpperCase().includes('TOTAL'))) {
+                    continue;
+                }
+
+                inTable = true;
+
+                let rawName = row[1] || '';
+                if (rawName.includes('[[')) {
+                    hasWikiLinks = true;
+                    rawName = rawName.replace(/\[\[(.*?)\]\]/g, '$1');
+                }
+                const name = rawName.replace(/\*\*/g, '').trim();
+                const grossQty = parseLocaleFloat(row[2]);
+                const unit = (row[3] || 'kg').replace(/[`*]/g, '').trim();
+                const wastePct = parseLocaleFloat(row[4]);
+
+                const priceCell = row[6] || '';
+                const currMatch = priceCell.match(/([€$£¥])|([A-Z]{3})/);
+                if (currMatch && !detectedCurrency) {
+                    detectedCurrency = currMatch[0];
+                }
+                const unitPrice = parseLocaleFloat(priceCell);
+
+                if (name || grossQty > 0 || unitPrice > 0) {
+                    ingredients.push({
+                        id: generateId(),
+                        name,
+                        grossQty: grossQty || 0.1,
+                        unit: unit || 'kg',
+                        wastePct: wastePct || 0,
+                        unitPrice: unitPrice || 0
+                    });
+                }
+            }
+
+            // Alérgenos (desde YAML o sección del cuerpo)
+            const rawAllergenData = yamlData.alergenos || body.match(/(?:Alérgenos(?: Presentes)?)[^\n]*\n([\s\S]*?)(?=\n(?:##?|> \[!|\s*$))/i)?.[1] || '';
+            const allergenIds = [];
+            const allergenStr = (Array.isArray(rawAllergenData) ? rawAllergenData.join(' ') : String(rawAllergenData)).toLowerCase();
+
+            if (!allergenStr.includes('sin alérgenos') && !allergenStr.includes('sin alergenos')) {
+                EU_ALLERGENS.forEach(allergen => {
+                    const cleanName = allergen.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                    if (
+                        allergenStr.includes(allergen.icon) ||
+                        allergenStr.includes(cleanName) ||
+                        allergenStr.includes(allergen.name.toLowerCase())
+                    ) {
+                        allergenIds.push(allergen.id);
+                    }
+                });
+            }
+
+            // Extracción de secciones de texto
+            const extractSection = (headerRegex) => {
+                let capturing = false;
+                const collected = [];
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (!capturing) {
+                        if (headerRegex.test(line)) capturing = true;
+                    } else {
+                        if (/^##?\s+/.test(line)) break;
+                        collected.push(line);
+                    }
+                }
+                return collected.join('\n').trim();
+            };
+
+            let recipeSteps = extractSection(/##.*Procedimiento/i);
+            if (recipeSteps.includes('Sin instrucciones especificadas.')) recipeSteps = '';
+
+            let recipePlating = extractSection(/##.*(?:Acabado|Emplatado)/i);
+            if (recipePlating.includes('Sin notas de emplatado.')) recipePlating = '';
+
+            // Conservación (Callout o Sección estándar)
+            let recipeConservation = '';
+            const consCalloutMatch = body.match(/>\s*\[!info\]\s*Conservación[^\n]*\n([\s\S]*?)(?=\n(?:##?|> \[!|\s*$))/i);
+            if (consCalloutMatch) {
+                recipeConservation = consCalloutMatch[1]
+                    .split(/\r?\n/)
+                    .map(l => l.replace(/^>\s?/, ''))
+                    .join('\n')
+                    .trim();
+            } else {
+                recipeConservation = extractSection(/##.*Conservación/i);
+            }
+
+            const hasCallouts = />\s*\[!/.test(body);
+
+            return {
+                recipeName: recipeName || '',
+                recipeCode: recipeCode || 'ESC-001',
+                recipeCategory: recipeCategory || 'Plato Principal - Carnes',
+                recipeChef: recipeChef || '',
+                recipeTime: recipeTime !== undefined ? recipeTime : 30,
+                recipePortions: recipePortions !== undefined ? recipePortions : 4,
+                targetFoodCost: targetFoodCost !== undefined ? targetFoodCost : 30,
+                taxRate: taxRate !== undefined ? taxRate : 10,
+                realMenuPrice: realMenuPrice !== undefined ? realMenuPrice : 0,
+                currencySymbol: detectedCurrency || '€',
+                optIncludeYaml: hasYaml,
+                optIncludeCallouts: hasCallouts,
+                optWikiLinks: hasWikiLinks,
+                allergens: allergenIds,
+                ingredients,
+                recipeSteps,
+                recipePlating,
+                recipeConservation,
+                recipeTags: recipeTags || 'escandallo, cocina'
+            };
+        }
+
+        /**
+         * Applies parsed Markdown data to the application state and refreshes the UI
+         */
+        function applyParsedMarkdown(content, fileName = '') {
+            try {
+                const parsed = parseMarkdownEscandallo(content);
+                if (!parsed || (!parsed.recipeName && (!parsed.ingredients || parsed.ingredients.length === 0))) {
+                    showToast('No se reconoció un formato de escandallo válido en el archivo.', 'warning');
+                    return;
+                }
+
+                state = { ...state, ...parsed };
+                populateFormInputs();
+                const displayName = parsed.recipeName || fileName || 'Escandallo';
+                showToast(`«${displayName}» cargado para modificar.`, 'success');
+            } catch (err) {
+                console.error('Error al procesar el archivo Markdown:', err);
+                showToast('Ocurrió un error al procesar el archivo Markdown.', 'warning');
+            }
+        }
+
+        /**
+         * Loads and parses an Obsidian Markdown file into the application state
+         */
+        async function loadMarkdownFile() {
+            // 1. Prioridad: File System Access API nativa si el navegador y el contexto seguro lo soportan
+            const isFileOrigin = window.location.protocol === 'file:' || !window.isSecureContext;
+            if (!isFileOrigin && typeof window.showOpenFilePicker === 'function') {
+                try {
+                    const [fileHandle] = await window.showOpenFilePicker({
+                        types: [
+                            {
+                                description: 'Documento Markdown de Obsidian (*.md)',
+                                accept: {
+                                    'text/markdown': ['.md', '.markdown']
+                                }
+                            }
+                        ],
+                        multiple: false
+                    });
+                    const file = await fileHandle.getFile();
+                    const content = await file.text();
+                    applyParsedMarkdown(content, file.name);
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                    console.warn('showOpenFilePicker no disponible o denegado, recurriendo al selector estándar:', err);
+                }
+            }
+
+            // 2. Fallback estándar para Firefox, Safari, file:/// o contextos restringidos
+            let input = document.getElementById('fileImportInput');
+            if (!input) {
+                input = document.createElement('input');
+                input.id = 'fileImportInput';
+                input.type = 'file';
+                input.accept = '.md,.markdown,text/markdown';
+                input.className = 'hidden';
+                document.body.appendChild(input);
+            }
+            input.onchange = async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                try {
+                    const content = await file.text();
+                    applyParsedMarkdown(content, file.name);
+                } catch (err) {
+                    console.error('Error al leer el archivo Markdown:', err);
+                    showToast('Error al leer el archivo seleccionado.', 'warning');
+                } finally {
+                    input.value = '';
+                }
+            };
+            input.click();
         }
 
         /**
@@ -1019,7 +1359,10 @@
                 showToast('Formulario reiniciado para nuevo escandallo.');
             });
 
-            // Download & Copy Buttons (direct event listeners to preserve trusted user gestures)
+            // Import, Download & Copy Buttons (direct event listeners to preserve trusted user gestures)
+            ['btnImportMdHeader', 'btnImportMdToolbar', 'btnMobileImportMd'].forEach(id => {
+                document.getElementById(id)?.addEventListener('click', loadMarkdownFile);
+            });
             ['btnDownloadMd', 'btnDownloadMdToolbar', 'btnMobileDownloadMd'].forEach(id => {
                 document.getElementById(id)?.addEventListener('click', downloadMarkdownFile);
             });
