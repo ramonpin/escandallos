@@ -387,15 +387,15 @@
                 tr.dataset.id = ing.id;
 
                 tr.innerHTML = `
-                    <td class="py-2.5 pl-4 pr-2 font-mono text-xs text-slate-400">${index + 1}</td>
-                    <td class="py-2 px-2">
-                        <input type="text" data-field="name" value="${safeName}" placeholder="Nombre del ingrediente..." aria-label="Nombre del ingrediente ${index + 1}" class="w-full px-2.5 py-1.5 bg-transparent hover:bg-white focus:bg-white border border-transparent hover:border-slate-200 focus:border-orange-500 rounded-lg text-sm font-medium text-slate-800 focus:outline-none transition">
+                    <td class="py-3 pl-4 pr-2 font-mono text-xs sm:text-sm text-slate-400 text-center">${index + 1}</td>
+                    <td class="py-3 px-3">
+                        <input type="text" data-field="name" value="${safeName}" placeholder="Nombre del ingrediente..." aria-label="Nombre del ingrediente ${index + 1}" class="w-full px-3.5 py-2.5 sm:py-3 bg-transparent hover:bg-white focus:bg-white border border-transparent hover:border-slate-200 focus:border-orange-500 rounded-xl text-sm sm:text-base font-semibold text-slate-900 focus:outline-none transition">
                     </td>
-                    <td class="py-2 px-2">
-                        <input type="number" data-field="grossQty" value="${ing.grossQty}" min="0" step="0.001" aria-label="Cantidad bruta de ${labelName}" class="w-full px-2 py-1.5 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-lg text-right font-mono text-xs sm:text-sm focus:outline-none">
+                    <td class="py-3 px-3">
+                        <input type="number" data-field="grossQty" value="${ing.grossQty}" min="0" step="0.001" aria-label="Cantidad bruta de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-xl text-right font-mono text-sm sm:text-base font-medium focus:outline-none">
                     </td>
-                    <td class="py-2 px-2">
-                        <select data-field="unit" aria-label="Unidad de medida de ${labelName}" class="w-full px-1.5 py-1.5 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-lg text-center font-mono text-xs focus:outline-none">
+                    <td class="py-3 px-2">
+                        <select data-field="unit" aria-label="Unidad de medida de ${labelName}" class="w-full px-2 py-2.5 sm:py-3 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-xl text-center font-mono text-sm sm:text-base font-medium focus:outline-none">
                             <option value="kg" ${ing.unit === 'kg' ? 'selected' : ''}>kg</option>
                             <option value="g" ${ing.unit === 'g' ? 'selected' : ''}>g</option>
                             <option value="L" ${ing.unit === 'L' ? 'selected' : ''}>L</option>
@@ -404,24 +404,24 @@
                             <option value="manojo" ${ing.unit === 'manojo' ? 'selected' : ''}>mjo</option>
                         </select>
                     </td>
-                    <td class="py-2 px-2">
-                        <input type="number" data-field="wastePct" value="${ing.wastePct}" min="0" max="99" step="0.5" aria-label="Porcentaje de merma de ${labelName}" class="w-full px-2 py-1.5 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-lg text-right font-mono text-xs sm:text-sm text-amber-700 focus:outline-none">
+                    <td class="py-3 px-3">
+                        <input type="number" data-field="wastePct" value="${ing.wastePct}" min="0" max="99" step="0.5" aria-label="Porcentaje de merma de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-xl text-right font-mono text-sm sm:text-base text-amber-700 font-medium focus:outline-none">
                     </td>
-                    <td class="py-2 px-2 text-right font-mono text-xs sm:text-sm text-slate-600 bg-slate-100/50" data-cell="netQty">
+                    <td class="py-3 px-3 text-right font-mono text-sm sm:text-base text-slate-700 bg-slate-100/60 font-medium" data-cell="netQty">
                         ${formatNumber(metrics.netQty, 3)} ${ing.unit}
                     </td>
-                    <td class="py-2 px-2">
-                        <input type="number" data-field="unitPrice" value="${ing.unitPrice}" min="0" step="0.01" aria-label="Precio unitario de ${labelName}" class="w-full px-2 py-1.5 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-lg text-right font-mono text-xs sm:text-sm focus:outline-none">
+                    <td class="py-3 px-3">
+                        <input type="number" data-field="unitPrice" value="${ing.unitPrice}" min="0" step="0.01" aria-label="Precio unitario de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-slate-50 focus:bg-white border border-slate-200 focus:border-orange-500 rounded-xl text-right font-mono text-sm sm:text-base font-medium focus:outline-none">
                     </td>
-                    <td class="py-2 px-2 text-right font-mono text-xs text-slate-500" data-cell="effectiveUnitPrice">
+                    <td class="py-3 px-3 text-right font-mono text-sm sm:text-base text-slate-600 font-medium" data-cell="effectiveUnitPrice">
                         ${formatCurrency(metrics.effectiveUnitPrice)}
                     </td>
-                    <td class="py-2 px-3 text-right font-mono text-xs sm:text-sm font-semibold text-slate-900 bg-orange-50/30" data-cell="totalCost">
+                    <td class="py-3 px-4 text-right font-mono text-sm sm:text-base font-bold text-slate-900 bg-orange-50/50" data-cell="totalCost">
                         ${formatCurrency(metrics.totalCost)}
                     </td>
-                    <td class="py-2 pl-1 pr-3 text-center no-print">
-                        <button type="button" data-action="remove" aria-label="Eliminar ${labelName}" class="p-1.5 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Eliminar ingrediente">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <td class="py-3 pl-1 pr-4 text-center no-print">
+                        <button type="button" data-action="remove" aria-label="Eliminar ${labelName}" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition" title="Eliminar ingrediente">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
@@ -593,12 +593,7 @@
                 : `${weightText} kg${hasNonPonderable ? '*' : ''}`;
             document.getElementById('tableTotalCost').textContent = formatCurrency(totals.totalCost, sym);
 
-            // Generate Markdown & Filename
-            const md = generateObsidianMarkdown(totals);
-            document.getElementById('markdownPreview').textContent = md;
-
-            const slug = slugifyFilename(state.recipeName || 'escandallo');
-            document.getElementById('previewFilename').textContent = `${slug}.md`;
+            // Persist state (Markdown preview removed to maximize editing space)
 
             // Persist in LocalStorage
             try {
@@ -650,13 +645,42 @@
         }
 
         /**
-         * Downloads the generated Markdown as a .md file for Obsidian
+         * Downloads or saves the generated Markdown as a .md file for Obsidian.
+         * Prompts the user to pick the destination folder/file using the native File System Access API.
          */
-        function downloadMarkdownFile() {
+        async function downloadMarkdownFile() {
             const totals = computeRecipeTotals();
             const mdContent = generateObsidianMarkdown(totals);
             const filename = `${slugifyFilename(state.recipeName || 'escandallo')}.md`;
 
+            // 1. Selector de ficheros del sistema nativo (File System Access API)
+            if (typeof window.showSaveFilePicker === 'function') {
+                try {
+                    const fileHandle = await window.showSaveFilePicker({
+                        suggestedName: filename,
+                        types: [
+                            {
+                                description: 'Documento Markdown de Obsidian (*.md)',
+                                accept: {
+                                    'text/markdown': ['.md'],
+                                },
+                            },
+                        ],
+                    });
+                    const writableStream = await fileHandle.createWritable();
+                    await writableStream.write(mdContent);
+                    await writableStream.close();
+                    showToast(`Ficha guardada con éxito como "${fileHandle.name}".`, 'success');
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') {
+                        return; // El usuario canceló el diálogo del selector de carpetas
+                    }
+                    console.warn('showSaveFilePicker no disponible o denegado, usando descarga estándar:', err);
+                }
+            }
+
+            // 2. Fallback estándar para navegadores sin File System Access API
             const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -667,7 +691,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            showToast(`Archivo "${filename}" descargado para tu bóveda de Obsidian.`, 'success');
+            showToast(`Archivo "${filename}" descargado.`, 'success');
         }
 
         /**
@@ -874,12 +898,10 @@
             });
 
             // Download & Copy Buttons
-            document.getElementById('btnDownloadMd').addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnDownloadMdSidebar').addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnMobileDownloadMd').addEventListener('click', downloadMarkdownFile);
-            document.getElementById('btnCopyMdHeader').addEventListener('click', copyMarkdownToClipboard);
-            document.getElementById('btnCopyMdSidebar').addEventListener('click', copyMarkdownToClipboard);
-            document.getElementById('btnMobileCopyMd').addEventListener('click', copyMarkdownToClipboard);
+            document.getElementById('btnDownloadMd')?.addEventListener('click', downloadMarkdownFile);
+            document.getElementById('btnMobileDownloadMd')?.addEventListener('click', downloadMarkdownFile);
+            document.getElementById('btnCopyMdHeader')?.addEventListener('click', copyMarkdownToClipboard);
+            document.getElementById('btnMobileCopyMd')?.addEventListener('click', copyMarkdownToClipboard);
         }
 
         window.addEventListener('DOMContentLoaded', initApp);

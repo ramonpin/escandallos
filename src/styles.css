@@ -15,7 +15,7 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* Custom Scrollbar for Markdown Preview */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -49,7 +49,7 @@ input[type=number] {
     }
 }
 
-/* Prevent any horizontal page overflow on mobile viewports */
+/* Prevent horizontal overflow on mobile viewports */
 html, body {
     max-width: 100%;
     overflow-x: hidden;
@@ -71,10 +71,6 @@ html, body {
     main {
         max-width: 100% !important;
         padding: 0 !important;
-    }
-    .xl\:col-span-8 {
-        grid-column: span 12 / span 12 !important;
-        width: 100% !important;
     }
     input, select, textarea {
         border-color: #cbd5e1 !important;
