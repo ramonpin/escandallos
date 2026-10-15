@@ -1,0 +1,9 @@
+{
+  "id": "escandallo-pro",
+  "name": "EscandalloPro",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Gestor técnico de escandallos gastronómicos con cálculo de mermas, food cost y guardado directo en el Vault.",
+  "author": "Ramón",
+  "isDesktopOnly": false
+}

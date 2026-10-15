@@ -12,10 +12,12 @@ install:
 build:
     @python3 build.py
 
-# Valida la sintaxis de JavaScript de src/app.js
+# Valida la sintaxis de JavaScript de src/app.js y del plugin de Obsidian
 check:
-    @echo "Verificando sintaxis de src/app.js..."
+    @echo "Verificando sintaxis de JavaScript..."
     @node --check src/app.js
+    @node --check src/plugin/main.js
+    @if [ -f "dist/escandallo-pro/main.js" ]; then node --check dist/escandallo-pro/main.js; fi
     @echo "✓ Sintaxis de JavaScript válida."
 
 # Ejecuta la batería de tests unitarios y de integración

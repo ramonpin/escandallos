@@ -20,12 +20,50 @@ Wikilinks).
 │   ├── index.html       # Aplicación autónoma principal para GitHub Pages
 │   ├── generador_de_escandallos_pro_para_obsidian.html # Archivo descargable
 │   ├── despensa.json    # Despensa servida desde el origen para la app
-│   └── .nojekyll        # Desactiva procesamiento Jekyll en GitHub Pages
-├── build.py             # Script de compilación y ensamblado
+│   ├── .nojekyll        # Desactiva procesamiento Jekyll en GitHub Pages
+│   └── escandallo-pro/  # Plugin nativo para Obsidian listo para usar
+│       ├── manifest.json # Metadatos del plugin de Obsidian
+│       ├── main.js       # Lógica encapsulada y registro de vista ItemView
+│       ├── styles.css    # Estilos Tailwind encapsulados
+│       ├── despensa.json # Plantilla de despensa
+│       └── README.md     # Instrucciones de instalación en el Vault
+├── build.py             # Script de compilación y ensamblado (web + plugin)
 ├── justfile             # Tareas y comandos de automatización (just)
 ├── package.json         # Dependencias de desarrollo (Tailwind CSS CLI)
 └── README.md            # Documentación del proyecto
 ```
+
+## Plugin Nativo de Obsidian (`dist/escandallo-pro`)
+
+Además de la versión web, `just build` compila automáticamente un plugin nativo
+para Obsidian con integración directa en el Vault.
+
+### Instalación en tu Vault
+
+1. Copia la carpeta compilada `dist/escandallo-pro` a la carpeta de plugins de
+   tu bóveda:
+   ```bash
+   cp -r dist/escandallo-pro /ruta/a/tu/vault/.obsidian/plugins/
+   ```
+2. En Obsidian, abre **Ajustes** > **Community plugins**.
+3. Haz clic en **Recargar plugins** y activa **EscandalloPro**.
+
+### Características en Obsidian
+
+- **Pestaña integrada:** Icono de cubiertos en la barra izquierda (Ribbon) y
+  vista en pestaña.
+- **Acceso directo al Vault:** Botón «Guardar en Vault» que crea o actualiza las
+  notas directamente en la carpeta configurada (por defecto `Escandallos/`) sin
+  diálogos de descarga del navegador.
+- **Comandos de la paleta (`Ctrl/Cmd + P`):**
+  - `EscandalloPro: Abrir gestor de escandallos`: abre o enfoca la pestaña
+    técnica.
+  - `EscandalloPro: Cargar escandallo de la nota activa`: lee y parsea la nota
+    Markdown abierta en el editor.
+  - `EscandalloPro: Buscar y cargar escandallo del Vault`: buscador difuso
+    (fuzzy) entre tus recetas.
+- **Despensa en el Vault:** Si colocas un archivo `despensa.json` en tu Vault,
+  la aplicación cargará tus ingredientes personalizados automáticamente.
 
 ## Despensa Externa (`despensa.json`)
 

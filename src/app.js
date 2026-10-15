@@ -20,6 +20,19 @@
 
         const STORAGE_KEY = 'escandallo_pro_obsidian_v1';
 
+        let currentRoot = typeof document !== 'undefined' ? document : null;
+        let appOptions = {};
+
+        function getEl(id) {
+            if (!currentRoot) return null;
+            return currentRoot.getElementById ? currentRoot.getElementById(id) : currentRoot.querySelector('#' + id);
+        }
+
+        function getAllEl(selector) {
+            if (!currentRoot) return [];
+            return currentRoot.querySelectorAll(selector);
+        }
+
         /**
          * Universal ID generator with fallback for non-secure contexts (file:// protocol)
          */
@@ -366,7 +379,8 @@
          * Renders the 14 EU Allergen checkboxes
          */
         function renderAllergens() {
-            const container = document.getElementById('allergensContainer');
+            const container = getEl('allergensContainer');
+            if (!container) return;
             container.innerHTML = EU_ALLERGENS.map(allergen => {
                 const isChecked = state.allergens.includes(allergen.id);
                 return `
@@ -400,8 +414,9 @@
          * Renders both the desktop table and mobile cards for ingredients, keeping them synchronized
          */
         function renderIngredientsTable() {
-            const tbody = document.getElementById('ingredientsTableBody');
-            const mobileList = document.getElementById('ingredientsMobileList');
+            const tbody = getEl('ingredientsTableBody');
+            const mobileList = getEl('ingredientsMobileList');
+            if (!tbody || !mobileList) return;
             tbody.innerHTML = '';
             mobileList.innerHTML = '';
 
@@ -579,7 +594,8 @@
             const sym = state.currencySymbol;
 
             // Update KPI Cards
-            document.getElementById('kpiTotalCost').textContent = formatCurrency(totals.totalCost, sym);
+            const kpiCostEl = getEl('kpiTotalCost');
+            if (kpiCostEl) kpiCostEl.textContent = formatCurrency(totals.totalCost, sym);
             
             // Weight calculation & indicators
             const weightKg = totals.totalNetGrams / 1000;
@@ -591,57 +607,80 @@
             } else if (hasNonPonderable) {
                 weightLabel = `Peso neto est.: ${weightText} kg*`;
             }
-            const kpiWeightEl = document.getElementById('kpiTotalWeight');
-            kpiWeightEl.textContent = weightLabel;
-            kpiWeightEl.title = hasNonPonderable
-                ? 'Los ingredientes en unidades o manojos no se suman al peso en kilogramos.'
-                : '';
-
-            document.getElementById('kpiPortionCost').textContent = formatCurrency(totals.costPerPortion, sym);
-            document.getElementById('kpiPortionsLabel').textContent = `Para ${totals.portions} ${totals.portions === 1 ? 'ración' : 'raciones'}`;
-
-            document.getElementById('kpiSuggestedNet').textContent = formatCurrency(totals.suggestedNetPrice, sym);
-            document.getElementById('kpiTargetFcLabel').textContent = `Según Food Cost ${totals.targetFc}%`;
-
-            document.getElementById('kpiTaxBadge').textContent = `+${totals.taxPct}% IVA`;
-            document.getElementById('kpiSuggestedGross').textContent = formatCurrency(totals.suggestedGrossPrice, sym);
-
-            // Real Food Cost status coloring
-            const fcEl = document.getElementById('kpiRealFoodCost');
-            const fcDot = document.getElementById('kpiFcStatusDot');
-            const fcHint = document.getElementById('kpiRealFcHint');
-            fcEl.textContent = `${formatNumber(totals.realFoodCostPct, 1)}%`;
-
-            if (totals.realFoodCostPct <= totals.targetFc) {
-                fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-emerald-400';
-                fcDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
-                fcHint.textContent = 'Óptimo (Dentro de objetivo)';
-            } else if (totals.realFoodCostPct <= totals.targetFc + 5) {
-                fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-amber-400';
-                fcDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
-                fcHint.textContent = 'Atención (Ligeramente alto)';
-            } else {
-                fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-rose-400';
-                fcDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
-                fcHint.textContent = 'Alerta (Desviación crítica)';
+            const kpiWeightEl = getEl('kpiTotalWeight');
+            if (kpiWeightEl) {
+                kpiWeightEl.textContent = weightLabel;
+                kpiWeightEl.title = hasNonPonderable
+                    ? 'Los ingredientes en unidades o manojos no se suman al peso en kilogramos.'
+                    : '';
             }
 
-            document.getElementById('kpiGrossMargin').textContent = formatCurrency(totals.grossMarginPerPortion, sym);
-            document.getElementById('kpiTotalBatchMargin').textContent = `Lote total: ${formatCurrency(totals.totalBatchMargin, sym)}`;
+            const kpiPortionCostEl = getEl('kpiPortionCost');
+            if (kpiPortionCostEl) kpiPortionCostEl.textContent = formatCurrency(totals.costPerPortion, sym);
+
+            const kpiPortionsLabelEl = getEl('kpiPortionsLabel');
+            if (kpiPortionsLabelEl) kpiPortionsLabelEl.textContent = `Para ${totals.portions} ${totals.portions === 1 ? 'ración' : 'raciones'}`;
+
+            const kpiSuggestedNetEl = getEl('kpiSuggestedNet');
+            if (kpiSuggestedNetEl) kpiSuggestedNetEl.textContent = formatCurrency(totals.suggestedNetPrice, sym);
+
+            const kpiTargetFcLabelEl = getEl('kpiTargetFcLabel');
+            if (kpiTargetFcLabelEl) kpiTargetFcLabelEl.textContent = `Según Food Cost ${totals.targetFc}%`;
+
+            const kpiTaxBadgeEl = getEl('kpiTaxBadge');
+            if (kpiTaxBadgeEl) kpiTaxBadgeEl.textContent = `+${totals.taxPct}% IVA`;
+
+            const kpiSuggestedGrossEl = getEl('kpiSuggestedGross');
+            if (kpiSuggestedGrossEl) kpiSuggestedGrossEl.textContent = formatCurrency(totals.suggestedGrossPrice, sym);
+
+            // Real Food Cost status coloring
+            const fcEl = getEl('kpiRealFoodCost');
+            const fcDot = getEl('kpiFcStatusDot');
+            const fcHint = getEl('kpiRealFcHint');
+            if (fcEl && fcDot && fcHint) {
+                fcEl.textContent = `${formatNumber(totals.realFoodCostPct, 1)}%`;
+
+                if (totals.realFoodCostPct <= totals.targetFc) {
+                    fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-emerald-400';
+                    fcDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+                    fcHint.textContent = 'Óptimo (Dentro de objetivo)';
+                } else if (totals.realFoodCostPct <= totals.targetFc + 5) {
+                    fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-amber-400';
+                    fcDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
+                    fcHint.textContent = 'Atención (Ligeramente alto)';
+                } else {
+                    fcEl.className = 'text-xl sm:text-2xl font-bold font-mono text-rose-400';
+                    fcDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+                    fcHint.textContent = 'Alerta (Desviación crítica)';
+                }
+            }
+
+            const kpiGrossMarginEl = getEl('kpiGrossMargin');
+            if (kpiGrossMarginEl) kpiGrossMarginEl.textContent = formatCurrency(totals.grossMarginPerPortion, sym);
+
+            const kpiTotalBatchMarginEl = getEl('kpiTotalBatchMargin');
+            if (kpiTotalBatchMarginEl) kpiTotalBatchMarginEl.textContent = `Lote total: ${formatCurrency(totals.totalBatchMargin, sym)}`;
 
             // Update Table Footer
-            document.getElementById('tableTotalNetWeight').textContent = totals.ponderableCount === 0
-                ? 'N/D'
-                : `${weightText} kg${hasNonPonderable ? '*' : ''}`;
-            document.getElementById('tableTotalCost').textContent = formatCurrency(totals.totalCost, sym);
+            const tableTotalNetWeightEl = getEl('tableTotalNetWeight');
+            if (tableTotalNetWeightEl) {
+                tableTotalNetWeightEl.textContent = totals.ponderableCount === 0
+                    ? 'N/D'
+                    : `${weightText} kg${hasNonPonderable ? '*' : ''}`;
+            }
 
-            // Persist state (Markdown preview removed to maximize editing space)
+            const tableTotalCostEl = getEl('tableTotalCost');
+            if (tableTotalCostEl) tableTotalCostEl.textContent = formatCurrency(totals.totalCost, sym);
 
-            // Persist in LocalStorage
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-            } catch (e) {
-                // Ignore storage quota errors in restricted frames
+            // Persist in LocalStorage when in browser mode
+            if (!appOptions || appOptions.mode !== 'obsidian') {
+                try {
+                    if (typeof localStorage !== 'undefined') {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                    }
+                } catch (e) {
+                    // Ignore storage quota errors in restricted frames
+                }
             }
         }
 
@@ -661,25 +700,27 @@
          * Syncs state values into the DOM form inputs
          */
         function populateFormInputs() {
-            document.getElementById('recipeName').value = state.recipeName || '';
-            document.getElementById('recipeCode').value = state.recipeCode || '';
-            document.getElementById('recipeCategory').value = state.recipeCategory || 'Plato Principal - Carnes';
-            document.getElementById('recipeChef').value = state.recipeChef || '';
-            document.getElementById('recipeTime').value = state.recipeTime || 0;
-            document.getElementById('recipeTags').value = state.recipeTags || '';
-            document.getElementById('recipePortions').value = state.recipePortions || 1;
-            document.getElementById('targetFoodCost').value = state.targetFoodCost || 30;
-            document.getElementById('taxRate').value = String(state.taxRate ?? 10);
-            document.getElementById('realMenuPrice').value = parseFloat(state.realMenuPrice || 0).toFixed(2);
-            document.getElementById('currencySymbol').value = state.currencySymbol || '€';
+            if (!getEl('recipeName')) return;
 
-            document.getElementById('optIncludeYaml').checked = state.optIncludeYaml !== false;
-            document.getElementById('optIncludeCallouts').checked = state.optIncludeCallouts !== false;
-            document.getElementById('optWikiLinks').checked = state.optWikiLinks !== false;
+            getEl('recipeName').value = state.recipeName || '';
+            getEl('recipeCode').value = state.recipeCode || '';
+            getEl('recipeCategory').value = state.recipeCategory || 'Plato Principal - Carnes';
+            getEl('recipeChef').value = state.recipeChef || '';
+            getEl('recipeTime').value = state.recipeTime || 0;
+            getEl('recipeTags').value = state.recipeTags || '';
+            getEl('recipePortions').value = state.recipePortions || 1;
+            getEl('targetFoodCost').value = state.targetFoodCost || 30;
+            getEl('taxRate').value = String(state.taxRate ?? 10);
+            getEl('realMenuPrice').value = parseFloat(state.realMenuPrice || 0).toFixed(2);
+            getEl('currencySymbol').value = state.currencySymbol || '€';
 
-            document.getElementById('recipeSteps').value = state.recipeSteps || '';
-            document.getElementById('recipePlating').value = state.recipePlating || '';
-            document.getElementById('recipeConservation').value = state.recipeConservation || '';
+            getEl('optIncludeYaml').checked = state.optIncludeYaml !== false;
+            getEl('optIncludeCallouts').checked = state.optIncludeCallouts !== false;
+            getEl('optWikiLinks').checked = state.optWikiLinks !== false;
+
+            getEl('recipeSteps').value = state.recipeSteps || '';
+            getEl('recipePlating').value = state.recipePlating || '';
+            getEl('recipeConservation').value = state.recipeConservation || '';
 
             renderAllergens();
             renderIngredientsTable();
@@ -695,6 +736,13 @@
          */
         async function downloadMarkdownFile() {
             const totals = computeRecipeTotals();
+
+            // En Obsidian, delegar directamente a la API nativa del Vault
+            if (appOptions && typeof appOptions.onSaveToVault === 'function') {
+                await appOptions.onSaveToVault(state, totals);
+                return;
+            }
+
             const mdContent = generateObsidianMarkdown(totals);
             const filename = `${slugifyFilename(state.recipeName || 'escandallo')}.md`;
 
@@ -1053,6 +1101,12 @@
          * Loads and parses an Obsidian Markdown file into the application state
          */
         async function loadMarkdownFile() {
+            // En Obsidian, abrir el selector fuzzy del Vault
+            if (appOptions && typeof appOptions.onLoadFromVault === 'function') {
+                appOptions.onLoadFromVault();
+                return;
+            }
+
             // 1. Prioridad: File System Access API nativa si el navegador y el contexto seguro lo soportan
             const isFileOrigin = window.location.protocol === 'file:' || !window.isSecureContext;
             if (!isFileOrigin && typeof window.showOpenFilePicker === 'function') {
@@ -1079,14 +1133,14 @@
             }
 
             // 2. Fallback estándar para Firefox, Safari, file:/// o contextos restringidos
-            let input = document.getElementById('fileImportInput');
+            let input = getEl('fileImportInput');
             if (!input) {
                 input = document.createElement('input');
                 input.id = 'fileImportInput';
                 input.type = 'file';
                 input.accept = '.md,.markdown,text/markdown';
                 input.className = 'hidden';
-                document.body.appendChild(input);
+                (currentRoot && currentRoot.body ? currentRoot.body : document.body).appendChild(input);
             }
             input.onchange = async (e) => {
                 const file = e.target.files?.[0];
@@ -1108,7 +1162,14 @@
          * Displays a non-intrusive toast notification
          */
         function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
+            if (appOptions && typeof appOptions.onShowNotice === 'function') {
+                appOptions.onShowNotice(message, type);
+                return;
+            }
+
+            const container = getEl('toastContainer');
+            if (!container) return;
+
             const toast = document.createElement('div');
             const bgClass = type === 'success' 
                 ? 'bg-[#2b2930] text-[#f3eff4] border-[#d0bcff]' 
@@ -1131,11 +1192,25 @@
         let cachedPantry = [];
 
         /**
-         * Loads the external pantry from despensa.json served from origin
+         * Loads the external pantry from despensa.json served from origin or Obsidian Vault
          */
         async function loadExternalPantry() {
-            const select = document.getElementById('quickIngredientSelect');
+            const select = getEl('quickIngredientSelect');
             if (!select) return;
+
+            // Soporte para despensa inyectada desde Obsidian
+            if (appOptions && typeof appOptions.onLoadPantry === 'function') {
+                try {
+                    const items = await appOptions.onLoadPantry();
+                    if (Array.isArray(items) && items.length > 0) {
+                        cachedPantry = items;
+                        renderPantrySelect(cachedPantry);
+                        return;
+                    }
+                } catch (err) {
+                    console.warn('Error al cargar despensa personalizada:', err);
+                }
+            }
 
             try {
                 // Fetch desde el mismo origen sin caché para obtener siempre los precios/insumos más recientes
@@ -1157,7 +1232,7 @@
          * Renders categorized or flat pantry options in the quickIngredientSelect dropdown
          */
         function renderPantrySelect(items) {
-            const select = document.getElementById('quickIngredientSelect');
+            const select = getEl('quickIngredientSelect');
             if (!select) return;
 
             select.innerHTML = '<option value="">+ Añadir desde despensa...</option>';
@@ -1211,18 +1286,25 @@
             });
         }
 
-        function initApp() {
-            // Load saved state from localStorage if available
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (parsed && Array.isArray(parsed.ingredients)) {
-                        state = { ...getDemoState(), ...parsed };
+        function initApp(root = (typeof document !== 'undefined' ? document : null), options = {}) {
+            currentRoot = root;
+            appOptions = options || {};
+
+            // Load saved state from localStorage if available and not in Obsidian mode
+            if (options.initialState) {
+                state = { ...getDemoState(), ...options.initialState };
+            } else if (options.mode !== 'obsidian') {
+                try {
+                    const saved = (typeof localStorage !== 'undefined') && localStorage.getItem(STORAGE_KEY);
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        if (parsed && Array.isArray(parsed.ingredients)) {
+                            state = { ...getDemoState(), ...parsed };
+                        }
                     }
+                } catch (e) {
+                    state = getDemoState();
                 }
-            } catch (e) {
-                state = getDemoState();
             }
 
             populateFormInputs();
@@ -1234,7 +1316,9 @@
                 'recipeTags', 'currencySymbol', 'recipeSteps', 'recipePlating', 'recipeConservation'
             ];
             textInputs.forEach(id => {
-                document.getElementById(id).addEventListener('input', (e) => {
+                const el = getEl(id);
+                if (!el) return;
+                el.addEventListener('input', (e) => {
                     state[id] = e.target.value;
                     if (id === 'currencySymbol') {
                         renderIngredientsTable();
@@ -1248,20 +1332,27 @@
 
             const numInputs = ['recipeTime', 'recipePortions', 'targetFoodCost', 'taxRate', 'realMenuPrice'];
             numInputs.forEach(id => {
-                document.getElementById(id).addEventListener('input', (e) => {
+                const el = getEl(id);
+                if (!el) return;
+                el.addEventListener('input', (e) => {
                     state[id] = parseFloat(e.target.value) || 0;
                     recalculateAndSync();
                 });
             });
 
             // Formatear PVP Carta Real a dos decimales al perder el foco
-            document.getElementById('realMenuPrice').addEventListener('blur', (e) => {
-                e.target.value = (parseFloat(e.target.value) || 0).toFixed(2);
-            });
+            const realMenuPriceEl = getEl('realMenuPrice');
+            if (realMenuPriceEl) {
+                realMenuPriceEl.addEventListener('blur', (e) => {
+                    e.target.value = (parseFloat(e.target.value) || 0).toFixed(2);
+                });
+            }
 
             // Obsidian Format Checkboxes
             ['optIncludeYaml', 'optIncludeCallouts', 'optWikiLinks'].forEach(id => {
-                document.getElementById(id).addEventListener('change', (e) => {
+                const el = getEl(id);
+                if (!el) return;
+                el.addEventListener('change', (e) => {
                     state[id] = e.target.checked;
                     recalculateAndSync();
                 });
@@ -1280,22 +1371,24 @@
                 renderIngredientsTable();
                 recalculateAndSync();
 
-                const isMobile = window.innerWidth < 768;
+                const isMobile = (typeof window !== 'undefined' && window.innerWidth < 768);
                 const selector = isMobile
                     ? '#ingredientsMobileList input[data-field="name"]'
                     : '#ingredientsTableBody input[data-field="name"]';
-                const inputs = document.querySelectorAll(selector);
+                const inputs = (currentRoot || document).querySelectorAll(selector);
                 if (inputs.length > 0) {
                     inputs[inputs.length - 1].focus();
-                    inputs[inputs.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (typeof inputs[inputs.length - 1].scrollIntoView === 'function') {
+                        inputs[inputs.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                 }
             };
 
-            document.getElementById('btnAddIngredient').addEventListener('click', addEmptyIngredientLine);
-            document.getElementById('btnMobileAddIng').addEventListener('click', addEmptyIngredientLine);
+            getEl('btnAddIngredient')?.addEventListener('click', addEmptyIngredientLine);
+            getEl('btnMobileAddIng')?.addEventListener('click', addEmptyIngredientLine);
 
             // Quick Ingredient Selector
-            document.getElementById('quickIngredientSelect').addEventListener('change', (e) => {
+            getEl('quickIngredientSelect')?.addEventListener('change', (e) => {
                 if (!e.target.value) return;
                 const [name, unit, grossQty, wastePct, unitPrice] = e.target.value.split('|');
                 state.ingredients.push({
@@ -1313,23 +1406,27 @@
             });
 
             // Load Demo Button
-            document.getElementById('btnLoadDemo').addEventListener('click', () => {
+            getEl('btnLoadDemo')?.addEventListener('click', () => {
                 state = getDemoState();
                 populateFormInputs();
                 showToast('Receta de demostración profesional cargada.');
             });
 
             // Clear All Modal Handlers
-            const clearModal = document.getElementById('clearModal');
-            document.getElementById('btnClearAll').addEventListener('click', () => {
-                clearModal.classList.remove('hidden');
-                clearModal.classList.add('flex');
+            const clearModal = getEl('clearModal');
+            getEl('btnClearAll')?.addEventListener('click', () => {
+                if (clearModal) {
+                    clearModal.classList.remove('hidden');
+                    clearModal.classList.add('flex');
+                }
             });
-            document.getElementById('btnCancelClear').addEventListener('click', () => {
-                clearModal.classList.add('hidden');
-                clearModal.classList.remove('flex');
+            getEl('btnCancelClear')?.addEventListener('click', () => {
+                if (clearModal) {
+                    clearModal.classList.add('hidden');
+                    clearModal.classList.remove('flex');
+                }
             });
-            document.getElementById('btnConfirmClear').addEventListener('click', () => {
+            getEl('btnConfirmClear')?.addEventListener('click', () => {
                 state = {
                     recipeName: '',
                     recipeCode: 'ESC-001',
@@ -1354,25 +1451,79 @@
                     recipeConservation: ''
                 };
                 populateFormInputs();
-                clearModal.classList.add('hidden');
-                clearModal.classList.remove('flex');
+                if (clearModal) {
+                    clearModal.classList.add('hidden');
+                    clearModal.classList.remove('flex');
+                }
                 showToast('Formulario reiniciado para nuevo escandallo.');
             });
 
             // Import, Download & Copy Buttons (direct event listeners to preserve trusted user gestures)
             ['btnImportMdHeader', 'btnImportMdToolbar', 'btnMobileImportMd'].forEach(id => {
-                document.getElementById(id)?.addEventListener('click', loadMarkdownFile);
+                getEl(id)?.addEventListener('click', loadMarkdownFile);
             });
             ['btnDownloadMd', 'btnDownloadMdToolbar', 'btnMobileDownloadMd'].forEach(id => {
-                document.getElementById(id)?.addEventListener('click', downloadMarkdownFile);
+                getEl(id)?.addEventListener('click', downloadMarkdownFile);
             });
             ['btnCopyMdHeader', 'btnCopyMdToolbar', 'btnMobileCopyMd'].forEach(id => {
-                document.getElementById(id)?.addEventListener('click', copyMarkdownToClipboard);
+                getEl(id)?.addEventListener('click', copyMarkdownToClipboard);
             });
+
+            // Text and accessibility adjustments when embedded in Obsidian
+            if (options.mode === 'obsidian') {
+                const btnDownloadHeader = getEl('btnDownloadMd');
+                if (btnDownloadHeader) {
+                    const span = btnDownloadHeader.querySelector('span');
+                    if (span) span.textContent = 'Guardar en Vault';
+                    btnDownloadHeader.title = 'Guardar ficha directamente en tu Vault de Obsidian';
+                }
+                const btnDownloadToolbar = getEl('btnDownloadMdToolbar');
+                if (btnDownloadToolbar) {
+                    const span = btnDownloadToolbar.querySelector('span');
+                    if (span) span.textContent = 'Guardar en Vault';
+                    btnDownloadToolbar.title = 'Guardar ficha directamente en tu Vault de Obsidian';
+                }
+                const btnMobileDownload = getEl('btnMobileDownloadMd');
+                if (btnMobileDownload) {
+                    const span = btnMobileDownload.querySelector('span');
+                    if (span) span.textContent = 'En Vault';
+                }
+
+                const btnImportHeader = getEl('btnImportMdHeader');
+                if (btnImportHeader) {
+                    const span = btnImportHeader.querySelector('span');
+                    if (span) span.textContent = 'Cargar Vault';
+                    btnImportHeader.title = 'Buscar y cargar un escandallo del Vault';
+                }
+                const btnImportToolbar = getEl('btnImportMdToolbar');
+                if (btnImportToolbar) {
+                    const span = btnImportToolbar.querySelector('span');
+                    if (span) span.textContent = 'Cargar de Vault';
+                }
+            }
+
+            return {
+                getState: () => state,
+                setState: (newState) => {
+                    state = { ...getDemoState(), ...newState };
+                    populateFormInputs();
+                    recalculateAndSync();
+                },
+                loadFromMarkdown: (content, fileName) => applyParsedMarkdown(content, fileName),
+                computeTotals: () => computeRecipeTotals(state),
+                generateMarkdown: () => generateObsidianMarkdown(computeRecipeTotals(state), state),
+                reloadPantry: () => loadExternalPantry()
+            };
         }
 
-        if (typeof window !== 'undefined') {
-            window.addEventListener('DOMContentLoaded', initApp);
+        const initEscandalloApp = initApp;
+
+        if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+            window.addEventListener('DOMContentLoaded', () => {
+                if (!window.__ESCANDALLO_OBSIDIAN_MODE__) {
+                    initApp(document, { mode: 'browser' });
+                }
+            });
         }
 
         if (typeof module !== 'undefined' && module.exports) {
@@ -1390,8 +1541,14 @@
                 computeRecipeTotals,
                 generateObsidianMarkdown,
                 parseMarkdownEscandallo,
+                applyParsedMarkdown,
                 getDemoState,
                 slugifyFilename,
+                initApp,
+                initEscandalloApp,
+                getEl,
+                recalculateAndSync,
+                populateFormInputs,
                 getState: () => state,
                 setState: (newState) => { state = newState; }
             };
