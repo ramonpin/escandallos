@@ -977,7 +977,7 @@
                     if (!capturing) {
                         if (headerRegex.test(line)) capturing = true;
                     } else {
-                        if (/^##?\s+/.test(line)) break;
+                        if (/^##?\s+/.test(line) || /^>\s*\[!/.test(line)) break;
                         collected.push(line);
                     }
                 }

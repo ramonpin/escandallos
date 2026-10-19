@@ -123,6 +123,11 @@ describe('Generación y parseo de Markdown para Obsidian', () => {
             assert.strictEqual(parsed.ingredients[0].unit, demo.ingredients[0].unit);
             assert.strictEqual(parsed.ingredients[0].wastePct, demo.ingredients[0].wastePct);
             assert.strictEqual(parsed.ingredients[0].unitPrice, demo.ingredients[0].unitPrice);
+
+            // El emplatado no debe arrastrar el callout de conservación
+            assert.strictEqual(parsed.recipePlating, demo.recipePlating);
+            assert.ok(!parsed.recipePlating.includes('Conservación'));
+            assert.strictEqual(parsed.recipeConservation, demo.recipeConservation);
         });
 
         it('reconstruye el estado desde Markdown plano sin YAML ni Callouts', () => {
