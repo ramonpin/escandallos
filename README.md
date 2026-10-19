@@ -12,13 +12,16 @@ Wikilinks).
 │   └── workflows/
 │       └── deploy.yml   # Despliegue automático a GitHub Pages desde dist/
 ├── src/
-│   ├── index.html       # Plantilla HTML base
-│   ├── styles.css       # Configuración Tailwind CSS v4 y estilos específicos
+│   ├── index.html       # Plantilla HTML base del generador de escandallos
 │   ├── app.js           # Lógica JavaScript cliente (cálculos, estado, exportación)
+│   ├── despensa.html    # Plantilla HTML de la SPA editora de despensa.json
+│   ├── despensa.js      # Lógica JavaScript del editor de despensa
+│   ├── styles.css       # Configuración Tailwind CSS v4 y estilos específicos
 │   └── despensa.json    # Despensa externa editable (insumos frecuentes, mermas, precios)
 ├── dist/                # Directorio único de distribución (generado con `just build`)
 │   ├── index.html       # Aplicación autónoma principal para GitHub Pages
 │   ├── generador_de_escandallos_pro_para_obsidian.html # Archivo descargable
+│   ├── editor_despensa.html # SPA autónoma para editar despensa.json
 │   ├── despensa.json    # Despensa servida desde el origen para la app
 │   └── .nojekyll        # Desactiva procesamiento Jekyll en GitHub Pages
 ├── build.py             # Script de compilación y ensamblado
@@ -46,6 +49,29 @@ de merma habituales con categorías opcionales:
   }
 ]
 ```
+
+## Editor de Despensa (`editor_despensa.html`)
+
+La aplicación incluye una segunda SPA, accesible desde el botón **Despensa** de
+la cabecera principal o directamente en `dist/editor_despensa.html`. Reutiliza
+el mismo tema visual y está pensada para editar el catálogo sin tocar el JSON a
+mano:
+
+- Carga `despensa.json` desde el mismo origen al arrancar (con los datos
+  incluidos en el HTML como respaldo si se abre con `file://`).
+- Edición en línea de categoría, nombre, unidad, cantidad bruta, merma y precio,
+  con validación inmediata de los campos obligatorios y rangos.
+- Búsqueda, filtro por categoría, ordenación por distintos criterios y acciones
+  de duplicar, eliminar y reordenar insumos.
+- KPIs de número de insumos, categorías, merma media y precio medio, además de
+  una vista previa del JSON resultante.
+- **Abrir JSON** y **Guardar JSON** con selector nativo de archivos (File System
+  Access API en HTTPS/localhost) o descarga estándar como fallback.
+- Copia del JSON al portapapeles y atajo `Ctrl/Cmd + S` para guardar.
+
+Al guardar desde el navegador, recuerda sustituir el archivo `src/despensa.json`
+del proyecto por el JSON descargado y volver a compilar con `just build` para
+publicarlo.
 
 ## Despliegue en GitHub Pages
 

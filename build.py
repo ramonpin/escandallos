@@ -5,6 +5,7 @@ Ensambla src/index.html, src/styles.css (compilado con Tailwind v4) y src/app.js
 en un único archivo autónomo: generador_de_escandallos_pro_para_obsidian.html
 """
 
+import json
 import os
 import shutil
 import subprocess
@@ -23,6 +24,9 @@ DIST_INDEX = os.path.join(DIST_DIR, "index.html")
 NOJEKYLL_PATH = os.path.join(DIST_DIR, ".nojekyll")
 SRC_PANTRY = os.path.join(SRC_DIR, "despensa.json")
 DIST_PANTRY = os.path.join(DIST_DIR, "despensa.json")
+DESPENSA_HTML_PATH = os.path.join(SRC_DIR, "despensa.html")
+DESPENSA_JS_PATH = os.path.join(SRC_DIR, "despensa.js")
+DIST_DESPENSA_HTML = os.path.join(DIST_DIR, "editor_despensa.html")
 
 
 def get_tailwind_cmd():
@@ -59,6 +63,22 @@ def compile_css():
     
     with open(COMPILED_CSS, "r", encoding="utf-8") as f:
         return f.read().strip()
+
+
+def read_pantry_raw():
+    """Devuelve el JSON de la despensa validado como texto compacto para incrustarlo."""
+    if not os.path.isfile(SRC_PANTRY):
+        return "[]"
+    with open(SRC_PANTRY, "r", encoding="utf-8") as f:
+        raw = f.read()
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError as err:
+        sys.exit(f"Error: src/despensa.json no es un JSON válido: {err}")
+    if not isinstance(parsed, list):
+        sys.exit("Error: src/despensa.json debe contener un array de insumos.")
+    # Se escapa "<" para que ningún dato pueda cerrar la etiqueta <script> que lo incrusta.
+    return json.dumps(parsed, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
 
 
 def assemble_html(css_content):
@@ -105,10 +125,38 @@ def assemble_html(css_content):
     print(f"  - dist/.nojekyll")
 
 
+def assemble_pantry_editor(css_content):
+    """Ensambla la SPA del editor de despensa.json en un único archivo HTML."""
+    print("-> Ensamblando editor de despensa para dist/...")
+    with open(DESPENSA_HTML_PATH, "r", encoding="utf-8") as f:
+        html = f.read()
+    with open(DESPENSA_JS_PATH, "r", encoding="utf-8") as f:
+        js = f.read()
+
+    if "/* __COMPILED_CSS__ */" not in html:
+        sys.exit("Error: No se encontró el marcador /* __COMPILED_CSS__ */ en src/despensa.html")
+    if "/* __PANTRY_SEED__ */" not in html:
+        sys.exit("Error: No se encontró el marcador /* __PANTRY_SEED__ */ en src/despensa.html")
+    if "/* __DESPENSA_JS__ */" not in html:
+        sys.exit("Error: No se encontró el marcador /* __DESPENSA_JS__ */ en src/despensa.html")
+
+    html = html.replace("/* __COMPILED_CSS__ */", css_content)
+    html = html.replace("/* __PANTRY_SEED__ */ []", read_pantry_raw())
+    html = html.replace("/* __DESPENSA_JS__ */", js)
+
+    os.makedirs(DIST_DIR, exist_ok=True)
+    with open(DIST_DESPENSA_HTML, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    size_kb = len(html.encode("utf-8")) / 1024
+    print(f"  - dist/editor_despensa.html ({size_kb:.1f} KB)")
+
+
 def main():
     start = time.time()
     css_content = compile_css()
     assemble_html(css_content)
+    assemble_pantry_editor(css_content)
     elapsed = time.time() - start
     print(f"✓ Proceso completado en {elapsed:.2f}s")
 

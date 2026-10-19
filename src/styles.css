@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @source "./index.html";
 @source "./app.js";
+@source "./despensa.html";
+@source "./despensa.js";
 
 @theme {
   --color-md-bg: #121214;
