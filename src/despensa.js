@@ -66,6 +66,15 @@ function formatCurrency(num, symbol = '€') {
     return `${formatNumber(num, 2)} ${symbol}`;
 }
 
+/**
+ * Devuelve el valor visible de un campo numérico con el separador decimal español.
+ * Los campos de texto (categoría, nombre) se devuelven sin transformar.
+ */
+function displayFieldValue(field, value) {
+    const decimals = NUMERIC_FIELDS[field];
+    return decimals !== undefined ? formatNumber(value, decimals) : String(value ?? '');
+}
+
 function roundTo(value, decimals) {
     const num = typeof value === 'number' ? value : parseFloat(value);
     if (!Number.isFinite(num)) return 0;
@@ -338,13 +347,13 @@ function renderTableRow(entry, position, total, reorderEnabled) {
                 </select>
             </td>
             <td class="py-2.5 px-2">
-                <input type="text" inputmode="decimal" data-field="grossQty" value="${escapeHtml(item.grossQty)}" class="${inputClasses('px-2.5 py-2 text-xs text-right font-mono', Boolean(errors.grossQty))}" aria-label="Cantidad bruta del insumo ${position + 1}">
+                <input type="text" inputmode="decimal" data-field="grossQty" value="${escapeHtml(displayFieldValue('grossQty', item.grossQty))}" class="${inputClasses('px-2.5 py-2 text-xs text-right font-mono', Boolean(errors.grossQty))}" aria-label="Cantidad bruta del insumo ${position + 1}">
             </td>
             <td class="py-2.5 px-2">
-                <input type="text" inputmode="decimal" data-field="wastePct" value="${escapeHtml(item.wastePct)}" class="${inputClasses('px-2.5 py-2 text-xs text-right font-mono', Boolean(errors.wastePct))}" aria-label="Merma del insumo ${position + 1}">
+                <input type="text" inputmode="decimal" data-field="wastePct" value="${escapeHtml(displayFieldValue('wastePct', item.wastePct))}" class="${inputClasses('px-2.5 py-2 text-xs text-right font-mono', Boolean(errors.wastePct))}" aria-label="Merma del insumo ${position + 1}">
             </td>
             <td class="py-2.5 px-2">
-                <input type="text" inputmode="decimal" data-field="unitPrice" value="${escapeHtml(item.unitPrice)}" class="${inputClasses('px-2.5 py-2 text-xs text-right font-mono', Boolean(errors.unitPrice))}" aria-label="Precio por unidad del insumo ${position + 1}">
+                <input type="text" inputmode="decimal" data-field="unitPrice" value="${escapeHtml(displayFieldValue('unitPrice', item.unitPrice))}" class="${inputClasses('px-2.5 py-2 text-xs text-right font-mono', Boolean(errors.unitPrice))}" aria-label="Precio por unidad del insumo ${position + 1}">
             </td>
             <td class="py-2.5 px-3 text-right">
                 <span data-cost class="font-mono text-xs font-semibold text-amber-300">${formatCurrency(cost)}</span>
@@ -385,15 +394,15 @@ function renderMobileCard(entry, position, total, reorderEnabled) {
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-[#938f99] uppercase tracking-wider mb-1">Cant. Bruta</label>
-                    <input type="text" inputmode="decimal" data-field="grossQty" value="${escapeHtml(item.grossQty)}" class="${inputClasses('px-3 py-2.5 text-sm text-right font-mono', Boolean(errors.grossQty))}">
+                    <input type="text" inputmode="decimal" data-field="grossQty" value="${escapeHtml(displayFieldValue('grossQty', item.grossQty))}" class="${inputClasses('px-3 py-2.5 text-sm text-right font-mono', Boolean(errors.grossQty))}">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-[#938f99] uppercase tracking-wider mb-1">Merma %</label>
-                    <input type="text" inputmode="decimal" data-field="wastePct" value="${escapeHtml(item.wastePct)}" class="${inputClasses('px-3 py-2.5 text-sm text-right font-mono', Boolean(errors.wastePct))}">
+                    <input type="text" inputmode="decimal" data-field="wastePct" value="${escapeHtml(displayFieldValue('wastePct', item.wastePct))}" class="${inputClasses('px-3 py-2.5 text-sm text-right font-mono', Boolean(errors.wastePct))}">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-[#938f99] uppercase tracking-wider mb-1">Precio / Ud</label>
-                    <input type="text" inputmode="decimal" data-field="unitPrice" value="${escapeHtml(item.unitPrice)}" class="${inputClasses('px-3 py-2.5 text-sm text-right font-mono', Boolean(errors.unitPrice))}">
+                    <input type="text" inputmode="decimal" data-field="unitPrice" value="${escapeHtml(displayFieldValue('unitPrice', item.unitPrice))}" class="${inputClasses('px-3 py-2.5 text-sm text-right font-mono', Boolean(errors.unitPrice))}">
                 </div>
             </div>
             <div class="flex items-center justify-between pt-2 border-t border-[#2d2b35]">
@@ -1021,7 +1030,14 @@ function onGridChange(event) {
     const el = event.target.closest('[data-field]');
     if (!el) return;
     updateItemFromElement(el);
-    if (el.dataset.field === 'categoria') refreshCategoryDatalist();
+    if (el.dataset.field === 'categoria') {
+        refreshCategoryDatalist();
+    } else if (NUMERIC_FIELDS[el.dataset.field] !== undefined) {
+        // Al confirmar el valor (blur o Enter) se muestra con coma decimal española.
+        const row = el.closest('[data-index]');
+        const item = row ? items[Number(row.dataset.index)] : null;
+        if (item) el.value = displayFieldValue(el.dataset.field, item[el.dataset.field]);
+    }
 }
 
 function onGridFocusOut(event) {
@@ -1037,7 +1053,7 @@ function onGridFocusOut(event) {
     if (NUMERIC_FIELDS[field] !== undefined) {
         const value = parseLocaleFloat(el.value);
         item[field] = value;
-        el.value = formatNumber(value, NUMERIC_FIELDS[field]);
+        el.value = displayFieldValue(field, value);
     } else if (field === 'name' || field === 'categoria') {
         const value = String(el.value || '').trim();
         item[field] = value;
@@ -1202,6 +1218,7 @@ if (typeof module !== 'undefined' && module.exports) {
         buildValidatedJson,
         computeStats,
         roundTo,
-        formatNumber
+        formatNumber,
+        displayFieldValue
     };
 }

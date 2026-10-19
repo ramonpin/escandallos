@@ -30,6 +30,8 @@ describe('Formateo, sanitización y funciones de utilidad', () => {
 
         it('gestiona entradas en formato string numérico', () => {
             assert.strictEqual(formatNumber('16.8', 2), '16,80');
+            assert.strictEqual(formatNumber('16,8', 2), '16,80');
+            assert.strictEqual(formatNumber('1.500,50', 2), '1500,50');
             assert.strictEqual(formatNumber('0', 2), '0,00');
         });
 

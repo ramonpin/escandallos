@@ -21,6 +21,12 @@
         const STORAGE_KEY = 'escandallo_pro_obsidian_v1';
 
         /**
+         * Decimales visibles para los campos numéricos de los ingredientes.
+         * Se usan tanto al renderizar como al formatear tras editar.
+         */
+        const INGREDIENT_FIELD_DECIMALS = { grossQty: 3, wastePct: 1, unitPrice: 2 };
+
+        /**
          * Universal ID generator with fallback for non-secure contexts (file:// protocol)
          */
         function generateId() {
@@ -100,7 +106,7 @@
          * Formats a number with Spanish locale formatting
          */
         function formatNumber(num, decimals = 2) {
-            const val = typeof num === 'number' ? num : parseFloat(num);
+            const val = typeof num === 'number' ? num : parseLocaleFloat(num);
             if (!Number.isFinite(val)) {
                 return (0).toLocaleString('es-ES', {
                     minimumFractionDigits: decimals,
@@ -147,9 +153,9 @@
          * - Effective Price per Net Unit = Unit Purchase Price / (1 - Waste% / 100)
          */
         function computeIngredientMetrics(ing) {
-            const gross = Math.max(0, parseFloat(ing.grossQty) || 0);
-            const waste = Math.min(99.9, Math.max(0, parseFloat(ing.wastePct) || 0));
-            const price = Math.max(0, parseFloat(ing.unitPrice) || 0);
+            const gross = Math.max(0, parseLocaleFloat(ing.grossQty) || 0);
+            const waste = Math.min(99.9, Math.max(0, parseLocaleFloat(ing.wastePct) || 0));
+            const price = Math.max(0, parseLocaleFloat(ing.unitPrice) || 0);
             const yieldFactor = (100 - waste) / 100;
 
             const netQty = gross * yieldFactor;
@@ -195,10 +201,10 @@
                 return { ...ing, ...metrics };
             });
 
-            const portions = Math.max(1, parseFloat(targetState.recipePortions) || 1);
-            const targetFc = Math.min(99, Math.max(1, parseFloat(targetState.targetFoodCost) || 30));
-            const taxPct = Math.max(0, parseFloat(targetState.taxRate) || 0);
-            const realGrossPrice = Math.max(0, parseFloat(targetState.realMenuPrice) || 0);
+            const portions = Math.max(1, parseLocaleFloat(targetState.recipePortions) || 1);
+            const targetFc = Math.min(99, Math.max(1, parseLocaleFloat(targetState.targetFoodCost) || 30));
+            const taxPct = Math.max(0, parseLocaleFloat(targetState.taxRate) || 0);
+            const realGrossPrice = Math.max(0, parseLocaleFloat(targetState.realMenuPrice) || 0);
 
             const costPerPortion = totalCost / portions;
             const suggestedNetPrice = costPerPortion / (targetFc / 100);
@@ -421,7 +427,7 @@
                         <input type="text" data-field="name" value="${safeName}" placeholder="Nombre del ingrediente..." aria-label="Nombre del ingrediente ${index + 1}" class="w-full px-3.5 py-2.5 sm:py-3 bg-transparent hover:bg-[#141218] focus:bg-[#141218] border border-transparent hover:border-[#3e3c46] focus:border-amber-400 rounded-xl text-sm sm:text-base font-semibold text-[#f3eff4] placeholder-[#79747e] focus:outline-none transition">
                     </td>
                     <td class="py-3 px-3">
-                        <input type="number" data-field="grossQty" value="${ing.grossQty}" min="0" step="0.001" aria-label="Cantidad bruta de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base font-medium text-[#f3eff4] focus:outline-none">
+                        <input type="text" inputmode="decimal" data-field="grossQty" value="${formatNumber(ing.grossQty, INGREDIENT_FIELD_DECIMALS.grossQty)}" aria-label="Cantidad bruta de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base font-medium text-[#f3eff4] focus:outline-none">
                     </td>
                     <td class="py-3 px-2">
                         <select data-field="unit" aria-label="Unidad de medida de ${labelName}" class="w-full px-2 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-center font-mono text-sm sm:text-base font-medium text-[#f3eff4] focus:outline-none">
@@ -434,13 +440,13 @@
                         </select>
                     </td>
                     <td class="py-3 px-3">
-                        <input type="number" data-field="wastePct" value="${ing.wastePct}" min="0" max="99" step="0.5" aria-label="Porcentaje de merma de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base text-amber-300 font-medium focus:outline-none">
+                        <input type="text" inputmode="decimal" data-field="wastePct" value="${formatNumber(ing.wastePct, INGREDIENT_FIELD_DECIMALS.wastePct)}" aria-label="Porcentaje de merma de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base text-amber-300 font-medium focus:outline-none">
                     </td>
                     <td class="py-3 px-3 text-right font-mono text-sm sm:text-base text-[#cac4d0] bg-[#17151c] font-medium" data-cell="netQty">
                         ${formatNumber(metrics.netQty, 3)} ${ing.unit}
                     </td>
                     <td class="py-3 px-3">
-                        <input type="number" data-field="unitPrice" value="${parseFloat(ing.unitPrice || 0).toFixed(2)}" min="0" step="0.01" aria-label="Precio unitario de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base font-medium text-[#f3eff4] focus:outline-none">
+                        <input type="text" inputmode="decimal" data-field="unitPrice" value="${formatNumber(ing.unitPrice, INGREDIENT_FIELD_DECIMALS.unitPrice)}" aria-label="Precio unitario de ${labelName}" class="w-full px-3 py-2.5 sm:py-3 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-xl text-right font-mono text-sm sm:text-base font-medium text-[#f3eff4] focus:outline-none">
                     </td>
                     <td class="py-3 px-3 text-right font-mono text-sm sm:text-base text-[#938f99] font-medium" data-cell="effectiveUnitPrice">
                         ${formatCurrency(metrics.effectiveUnitPrice)}
@@ -479,7 +485,7 @@
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                         <div>
                             <label class="block text-[11px] font-semibold uppercase text-[#938f99] mb-1">Cant. Bruta</label>
-                            <input type="number" data-field="grossQty" value="${ing.grossQty}" min="0" step="0.001" aria-label="Cantidad bruta" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-[#f3eff4] text-right focus:outline-none">
+                            <input type="text" inputmode="decimal" data-field="grossQty" value="${formatNumber(ing.grossQty, INGREDIENT_FIELD_DECIMALS.grossQty)}" aria-label="Cantidad bruta" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-[#f3eff4] text-right focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold uppercase text-[#938f99] mb-1">Unidad</label>
@@ -494,11 +500,11 @@
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold uppercase text-amber-400 mb-1">Merma %</label>
-                            <input type="number" data-field="wastePct" value="${ing.wastePct}" min="0" max="99" step="0.5" aria-label="Porcentaje de merma" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-amber-300 text-right focus:outline-none">
+                            <input type="text" inputmode="decimal" data-field="wastePct" value="${formatNumber(ing.wastePct, INGREDIENT_FIELD_DECIMALS.wastePct)}" aria-label="Porcentaje de merma" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-amber-300 text-right focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold uppercase text-[#938f99] mb-1">Precio / Ud</label>
-                            <input type="number" data-field="unitPrice" value="${parseFloat(ing.unitPrice || 0).toFixed(2)}" min="0" step="0.01" aria-label="Precio unitario" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-[#f3eff4] text-right focus:outline-none">
+                            <input type="text" inputmode="decimal" data-field="unitPrice" value="${formatNumber(ing.unitPrice, INGREDIENT_FIELD_DECIMALS.unitPrice)}" aria-label="Precio unitario" class="w-full min-w-0 px-2.5 py-2 bg-[#141218] focus:bg-[#191720] border border-[#33303a] focus:border-amber-400 rounded-lg font-mono text-sm text-[#f3eff4] text-right focus:outline-none">
                         </div>
                     </div>
 
@@ -518,9 +524,10 @@
                 const bindRowEvents = (containerEl, partnerEl) => {
                     containerEl.querySelectorAll('input, select').forEach(input => {
                         const field = input.getAttribute('data-field');
+                        const isNumericField = INGREDIENT_FIELD_DECIMALS[field] !== undefined;
 
                         input.addEventListener('input', (e) => {
-                            const val = e.target.type === 'number' ? (parseFloat(e.target.value) || 0) : e.target.value;
+                            const val = isNumericField ? parseLocaleFloat(e.target.value) : e.target.value;
                             ing[field] = val;
 
                             // Sync value to partner view (mobile <-> desktop)
@@ -539,16 +546,19 @@
                             recalculateAndSync();
                         });
 
-                        // Asegurar formato con dos decimales exactos en el campo de precio al desenfocar
-                        if (field === 'unitPrice') {
-                            input.addEventListener('blur', (e) => {
-                                const formatted = (parseFloat(e.target.value) || 0).toFixed(2);
+                        // Mostrar los campos numéricos con coma decimal española al confirmar el valor
+                        if (isNumericField) {
+                            const formatNumericField = (e) => {
+                                const formatted = formatNumber(parseLocaleFloat(e.target.value), INGREDIENT_FIELD_DECIMALS[field]);
+                                ing[field] = parseLocaleFloat(formatted);
                                 e.target.value = formatted;
                                 const partnerInput = partnerEl.querySelector(`[data-field="${field}"]`);
                                 if (partnerInput && partnerInput !== e.target) {
                                     partnerInput.value = formatted;
                                 }
-                            });
+                            };
+                            input.addEventListener('blur', formatNumericField);
+                            input.addEventListener('change', formatNumericField);
                         }
                     });
 
@@ -668,9 +678,9 @@
             document.getElementById('recipeTime').value = state.recipeTime || 0;
             document.getElementById('recipeTags').value = state.recipeTags || '';
             document.getElementById('recipePortions').value = state.recipePortions || 1;
-            document.getElementById('targetFoodCost').value = state.targetFoodCost || 30;
+            document.getElementById('targetFoodCost').value = formatNumber(state.targetFoodCost || 30, 1);
             document.getElementById('taxRate').value = String(state.taxRate ?? 10);
-            document.getElementById('realMenuPrice').value = parseFloat(state.realMenuPrice || 0).toFixed(2);
+            document.getElementById('realMenuPrice').value = formatNumber(state.realMenuPrice || 0, 2);
             document.getElementById('currencySymbol').value = state.currencySymbol || '€';
 
             document.getElementById('optIncludeYaml').checked = state.optIncludeYaml !== false;
@@ -1246,17 +1256,29 @@
                 });
             });
 
-            const numInputs = ['recipeTime', 'recipePortions', 'targetFoodCost', 'taxRate', 'realMenuPrice'];
-            numInputs.forEach(id => {
+            const integerInputs = ['recipeTime', 'recipePortions', 'taxRate'];
+            integerInputs.forEach(id => {
                 document.getElementById(id).addEventListener('input', (e) => {
                     state[id] = parseFloat(e.target.value) || 0;
                     recalculateAndSync();
                 });
             });
 
-            // Formatear PVP Carta Real a dos decimales al perder el foco
-            document.getElementById('realMenuPrice').addEventListener('blur', (e) => {
-                e.target.value = (parseFloat(e.target.value) || 0).toFixed(2);
+            const decimalInputs = { targetFoodCost: 1, realMenuPrice: 2 };
+            Object.keys(decimalInputs).forEach(id => {
+                const input = document.getElementById(id);
+                const decimals = decimalInputs[id];
+                input.addEventListener('input', (e) => {
+                    state[id] = parseLocaleFloat(e.target.value) || 0;
+                    recalculateAndSync();
+                });
+                const formatDecimalField = (e) => {
+                    const formatted = formatNumber(parseLocaleFloat(e.target.value), decimals);
+                    e.target.value = formatted;
+                    state[id] = parseLocaleFloat(formatted);
+                };
+                input.addEventListener('blur', formatDecimalField);
+                input.addEventListener('change', formatDecimalField);
             });
 
             // Obsidian Format Checkboxes

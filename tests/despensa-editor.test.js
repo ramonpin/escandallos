@@ -68,6 +68,13 @@ describe('Editor de despensa: normalización y validación', () => {
         assert.match(json, /^\s*\[/);
     });
 
+    it('muestra los campos numéricos con el mismo separador decimal español que los cálculos', () => {
+        assert.equal(editor.displayFieldValue('unitPrice', 1.5), '1,50');
+        assert.equal(editor.displayFieldValue('grossQty', 0.08), '0,080');
+        assert.equal(editor.displayFieldValue('wastePct', 15), '15,00');
+        assert.equal(editor.displayFieldValue('name', 'Cebolla'), 'Cebolla');
+    });
+
     it('bloquea la exportación si existe algún error y localiza el primero', () => {
         const result = editor.buildValidatedJson([
             { categoria: 'Carnes', name: 'Pollo', unit: 'kg', grossQty: 1, wastePct: 0, unitPrice: 5 },

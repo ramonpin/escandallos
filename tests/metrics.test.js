@@ -74,6 +74,20 @@ describe('Cálculos de métricas de ingredientes y escandallo', () => {
             assert.strictEqual(mjo.netGrams, 0);
         });
 
+        it('acepta valores con separador decimal español procedentes de formularios o Markdown', () => {
+            const metrics = computeIngredientMetrics({
+                grossQty: '1,5',
+                unit: 'kg',
+                wastePct: '10,5',
+                unitPrice: '2,50'
+            });
+
+            assert.strictEqual(metrics.gross, 1.5);
+            assert.strictEqual(metrics.waste, 10.5);
+            assert.strictEqual(metrics.price, 2.5);
+            assert.strictEqual(metrics.totalCost, 3.75);
+        });
+
         it('acota valores extremos o negativos', () => {
             const negativeWaste = computeIngredientMetrics({ grossQty: 1, unit: 'kg', wastePct: -10, unitPrice: 5 });
             assert.strictEqual(negativeWaste.waste, 0);
@@ -146,6 +160,24 @@ describe('Cálculos de métricas de ingredientes y escandallo', () => {
             assert.ok(totals.realNetPrice > 0);
             assert.ok(totals.realFoodCostPct > 0);
             assert.ok(totals.grossMarginPerPortion > 0);
+        });
+
+        it('interpreta parámetros con coma decimal al reconstruir un escandallo', () => {
+            const totals = computeRecipeTotals({
+                recipePortions: '2',
+                targetFoodCost: '25,5',
+                taxRate: '10',
+                realMenuPrice: '20,00',
+                ingredients: [
+                    { grossQty: '1,5', unit: 'kg', wastePct: '10,5', unitPrice: '2,50' }
+                ]
+            });
+
+            assert.strictEqual(totals.portions, 2);
+            assert.strictEqual(totals.targetFc, 25.5);
+            assert.strictEqual(totals.taxPct, 10);
+            assert.strictEqual(totals.realGrossPrice, 20);
+            assert.strictEqual(totals.totalCost, 3.75);
         });
 
         it('evita divisiones por cero con valores extremos o vacíos', () => {
