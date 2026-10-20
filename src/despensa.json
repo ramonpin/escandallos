@@ -3,47 +3,47 @@
     "categoria": "Grasas y Aceites",
     "name": "Aceite de Oliva Virgen Extra",
     "unit": "L",
-    "grossQty": 0.08,
+    "grossQty": 1,
     "wastePct": 0,
-    "unitPrice": 9.2
+    "unitPrice": 5
   },
   {
     "categoria": "Grasas y Aceites",
     "name": "Mantequilla Extra 82% M.G.",
     "unit": "kg",
-    "grossQty": 0.1,
+    "grossQty": 1,
     "wastePct": 0,
-    "unitPrice": 11.5
+    "unitPrice": 10
   },
   {
     "categoria": "Verduras y Hortalizas",
     "name": "Cebolla Dulce",
     "unit": "kg",
-    "grossQty": 0.4,
+    "grossQty": 1,
     "wastePct": 15,
-    "unitPrice": 1.6
+    "unitPrice": 0.9
   },
   {
     "categoria": "Verduras y Hortalizas",
     "name": "Ajo Morado",
     "unit": "kg",
-    "grossQty": 0.05,
-    "wastePct": 12,
-    "unitPrice": 5.8
+    "grossQty": 1,
+    "wastePct": 20,
+    "unitPrice": 3
   },
   {
     "categoria": "Verduras y Hortalizas",
     "name": "Patata Agria / Monalisa",
     "unit": "kg",
-    "grossQty": 0.8,
-    "wastePct": 18,
-    "unitPrice": 1.4
+    "grossQty": 1,
+    "wastePct": 10,
+    "unitPrice": 0.7
   },
   {
     "categoria": "Verduras y Hortalizas",
     "name": "Zanahoria",
     "unit": "kg",
-    "grossQty": 0.3,
+    "grossQty": 1,
     "wastePct": 20,
     "unitPrice": 1.3
   },
@@ -51,15 +51,15 @@
     "categoria": "Lácteos y Derivados",
     "name": "Nata Culinaria 35% M.G.",
     "unit": "L",
-    "grossQty": 0.25,
+    "grossQty": 1,
     "wastePct": 0,
-    "unitPrice": 4.1
+    "unitPrice": 7
   },
   {
     "categoria": "Lácteos y Derivados",
     "name": "Queso Parmigiano Reggiano 24m",
     "unit": "kg",
-    "grossQty": 0.15,
+    "grossQty": 1,
     "wastePct": 5,
     "unitPrice": 24.5
   },
@@ -67,7 +67,7 @@
     "categoria": "Fondos y Caldos",
     "name": "Fondo Oscuro de Ternera",
     "unit": "L",
-    "grossQty": 0.3,
+    "grossQty": 1,
     "wastePct": 0,
     "unitPrice": 6.5
   },
@@ -75,17 +75,17 @@
     "categoria": "Fondos y Caldos",
     "name": "Caldo de Ave Concentrado",
     "unit": "L",
-    "grossQty": 0.5,
+    "grossQty": 1,
     "wastePct": 0,
-    "unitPrice": 3.8
+    "unitPrice": 5.8
   },
   {
     "categoria": "Huevos y Proteínas",
     "name": "Huevos Camperos M/L",
     "unit": "ud",
-    "grossQty": 4,
+    "grossQty": 1,
     "wastePct": 0,
-    "unitPrice": 0.28
+    "unitPrice": 0.3
   },
   {
     "categoria": "Condimentos y Especias",
@@ -94,5 +94,157 @@
     "grossQty": 0.02,
     "wastePct": 0,
     "unitPrice": 2.5
+  },
+  {
+    "categoria": "Embutidos",
+    "name": "Cecina",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 23
+  },
+  {
+    "categoria": "Embutidos",
+    "name": "Lomo embutido",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 12
+  },
+  {
+    "categoria": "Embutidos",
+    "name": "Chorizo fresco",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 7.6
+  },
+  {
+    "categoria": "Embutidos",
+    "name": "Chorizo dulce",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 8.5
+  },
+  {
+    "categoria": "Embutidos",
+    "name": "Chorizo rabioso",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 8.5
+  },
+  {
+    "categoria": "Embutidos",
+    "name": "Chorizo picante",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 8.5
+  },
+  {
+    "categoria": "Embutidos",
+    "name": "Salchichón",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 8.5
+  },
+  {
+    "categoria": "Carnes y Aves",
+    "name": "Morcilla",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 11
+  },
+  {
+    "categoria": "Carnes y Aves",
+    "name": "Costilla adobada",
+    "unit": "kg",
+    "grossQty": 0.1,
+    "wastePct": 1,
+    "unitPrice": 8.5
+  },
+  {
+    "categoria": "Carnes y Aves",
+    "name": "Picadillo",
+    "unit": "kg",
+    "grossQty": 0.1,
+    "wastePct": 1,
+    "unitPrice": 7
+  },
+  {
+    "categoria": "Grasas y Aceites",
+    "name": "Aceite de orujo de oliva",
+    "unit": "L",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 2.5
+  },
+  {
+    "categoria": "Grasas y Aceites",
+    "name": "aceite alto oleico",
+    "unit": "L",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 2
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "Queso de cabra",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.2,
+    "unitPrice": 11
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "Queso cheddar",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 13
+  },
+  {
+    "categoria": "Harinas y Cereales",
+    "name": "Harina de trigo",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 0.85
+  },
+  {
+    "categoria": "Harinas y Cereales",
+    "name": "Pan rallado",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 1
+  },
+  {
+    "categoria": "Carnes y Aves",
+    "name": "Oreja",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 8
+  },
+  {
+    "categoria": "Carnes y Aves",
+    "name": "Carrillera cerdo",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.5,
+    "unitPrice": 14
+  },
+  {
+    "categoria": "Carnes y Aves",
+    "name": "Patas cerdo",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.1,
+    "unitPrice": 5
   }
 ]
