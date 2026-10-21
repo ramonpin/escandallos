@@ -110,6 +110,47 @@ function foldText(str) {
         .trim();
 }
 
+const MINOR_TITLE_WORDS = new Set([
+    // Artículos
+    'el', 'la', 'los', 'las', 'lo', 'un', 'una', 'unos', 'unas',
+    // Conjunciones
+    'y', 'e', 'o', 'u', 'ni', 'que', 'pero', 'sino', 'aunque', 'como',
+    'cuando', 'donde', 'mientras', 'pues',
+    // Preposiciones y contracciones habituales
+    'a', 'al', 'de', 'del', 'en', 'con', 'sin', 'por', 'para',
+    'sobre', 'entre', 'hacia', 'hasta', 'desde', 'bajo', 'contra',
+    'durante', 'mediante', 'según'
+]);
+
+const TITLE_WORD_PATTERN = /[\p{L}\p{N}][\p{L}\p{N}'’.]*/gu;
+const TITLE_ACRONYM_PATTERN = /^(?:\p{Lu}{1,}\.)+\p{Lu}{0,}\.?$/u;
+
+function capitalizeTitleToken(token) {
+    if (/\p{N}/u.test(token) || TITLE_ACRONYM_PATTERN.test(token)) return token;
+    const lower = token.toLocaleLowerCase('es');
+    return lower.charAt(0).toLocaleUpperCase('es') + lower.slice(1);
+}
+
+/**
+ * Convierte un texto a formato título: cada palabra empieza en mayúscula
+ * salvo artículos, conjunciones y preposiciones cortas, que quedan en minúscula
+ * (siempre que no sean la primera palabra).
+ */
+function formatTitleCase(value) {
+    const text = String(value ?? '').trim().replace(/\s+/g, ' ');
+    if (!text) return '';
+
+    let position = 0;
+    return text.replace(TITLE_WORD_PATTERN, token => {
+        const isFirst = position === 0;
+        position += 1;
+        if (!isFirst && MINOR_TITLE_WORDS.has(foldText(token))) {
+            return token.toLocaleLowerCase('es');
+        }
+        return capitalizeTitleToken(token);
+    });
+}
+
 function normalizeUnit(unit) {
     const raw = String(unit ?? '').trim();
     if (!raw) return 'kg';
@@ -129,8 +170,8 @@ function normalizeItem(raw) {
     const hasPrice = src.unitPrice !== undefined && src.unitPrice !== null && src.unitPrice !== '';
 
     return {
-        categoria: String(src.categoria ?? '').trim(),
-        name: String(src.name ?? '').trim(),
+        categoria: formatTitleCase(src.categoria),
+        name: formatTitleCase(src.name),
         unit: normalizeUnit(src.unit),
         grossQty: hasGross ? parseLocaleFloat(src.grossQty) : 0.1,
         wastePct: hasWaste ? parseLocaleFloat(src.wastePct) : 0,
@@ -1029,14 +1070,18 @@ function onGridInput(event) {
 function onGridChange(event) {
     const el = event.target.closest('[data-field]');
     if (!el) return;
+    const field = el.dataset.field;
+    if (field === 'name' || field === 'categoria') {
+        el.value = formatTitleCase(el.value);
+    }
     updateItemFromElement(el);
-    if (el.dataset.field === 'categoria') {
+    if (field === 'categoria') {
         refreshCategoryDatalist();
-    } else if (NUMERIC_FIELDS[el.dataset.field] !== undefined) {
+    } else if (NUMERIC_FIELDS[field] !== undefined) {
         // Al confirmar el valor (blur o Enter) se muestra con coma decimal española.
         const row = el.closest('[data-index]');
         const item = row ? items[Number(row.dataset.index)] : null;
-        if (item) el.value = displayFieldValue(el.dataset.field, item[el.dataset.field]);
+        if (item) el.value = displayFieldValue(field, item[field]);
     }
 }
 
@@ -1055,7 +1100,7 @@ function onGridFocusOut(event) {
         item[field] = value;
         el.value = displayFieldValue(field, value);
     } else if (field === 'name' || field === 'categoria') {
-        const value = String(el.value || '').trim();
+        const value = formatTitleCase(el.value);
         item[field] = value;
         el.value = value;
         if (field === 'categoria') refreshCategoryDatalist();
@@ -1219,6 +1264,7 @@ if (typeof module !== 'undefined' && module.exports) {
         computeStats,
         roundTo,
         formatNumber,
-        displayFieldValue
+        displayFieldValue,
+        formatTitleCase
     };
 }

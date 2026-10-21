@@ -75,6 +75,34 @@ describe('Editor de despensa: normalización y validación', () => {
         assert.equal(editor.displayFieldValue('name', 'Cebolla'), 'Cebolla');
     });
 
+    it('formatea categorías y nombres con mayúsculas de título respetando palabras menores', () => {
+        assert.equal(editor.formatTitleCase('aceite de oliva virgen extra'), 'Aceite de Oliva Virgen Extra');
+        assert.equal(editor.formatTitleCase('grasas y aceites'), 'Grasas y Aceites');
+        assert.equal(editor.formatTitleCase('la sal en escamas'), 'La Sal en Escamas');
+        assert.equal(editor.formatTitleCase('sal y pimienta'), 'Sal y Pimienta');
+        assert.equal(editor.formatTitleCase('producto a granel'), 'Producto a Granel');
+        assert.equal(editor.formatTitleCase('de la casa'), 'De la Casa');
+        assert.equal(editor.formatTitleCase('  carrillera   cerdo  '), 'Carrillera Cerdo');
+        assert.equal(editor.formatTitleCase('nata culinaria 35% M.G.'), 'Nata Culinaria 35% M.G.');
+        assert.equal(editor.formatTitleCase('queso parmigiano reggiano 24m'), 'Queso Parmigiano Reggiano 24m');
+        assert.equal(editor.formatTitleCase('sub-receta / base'), 'Sub-Receta / Base');
+        assert.equal(editor.formatTitleCase(''), '');
+    });
+
+    it('aplica el formato título al cargar o importar insumos', () => {
+        const item = editor.normalizeItem({
+            categoria: 'grasas y aceites',
+            name: 'aceite de oliva virgen extra 82% M.G.',
+            unit: 'L',
+            grossQty: 1,
+            wastePct: 0,
+            unitPrice: 10
+        });
+
+        assert.equal(item.categoria, 'Grasas y Aceites');
+        assert.equal(item.name, 'Aceite de Oliva Virgen Extra 82% M.G.');
+    });
+
     it('bloquea la exportación si existe algún error y localiza el primero', () => {
         const result = editor.buildValidatedJson([
             { categoria: 'Carnes', name: 'Pollo', unit: 'kg', grossQty: 1, wastePct: 0, unitPrice: 5 },
