@@ -32,47 +32,54 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
+            <!-- Back to Escandallos -->
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <a href="./index.html" class="md:hidden bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] p-2 rounded-xl transition flex items-center justify-center shrink-0" title="Volver al generador de escandallos" aria-label="Volver al generador de escandallos">
                     <svg class="w-4 h-4 text-[#d0bcff] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                     </svg>
                 </a>
 
                 <a href="./index.html" class="hidden md:flex text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] px-3 py-2 rounded-xl transition items-center gap-1.5 font-medium" title="Volver al generador de escandallos" aria-label="Volver al generador de escandallos">
                     <svg class="w-4 h-4 text-[#d0bcff] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                     </svg>
                     <span>Escandallos</span>
                 </a>
+            </div>
+        </div>
 
-                <button id="btnOpenJsonHeader" type="button" class="text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] p-2 sm:px-3 sm:py-2 rounded-xl transition flex items-center gap-1.5 font-medium" title="Abrir un archivo despensa.json desde el sistema" aria-label="Abrir archivo JSON">
+        <!-- Action Ribbon -->
+        <div class="border-t border-[#2d2b35] bg-[#191720]">
+            <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 flex items-center gap-1.5 sm:gap-2 overflow-x-auto">
+                <button id="btnOpenJsonHeader" type="button" class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] px-3 py-2 rounded-xl transition font-medium" title="Abrir un archivo despensa.json desde el sistema" aria-label="Abrir archivo JSON">
                     <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                     </svg>
-                    <span class="hidden md:inline">Abrir JSON</span>
+                    <span>Abrir</span>
                 </button>
 
-                <button id="btnReloadSourceHeader" type="button" class="hidden lg:flex text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] px-3 py-2 rounded-xl transition items-center gap-1.5 font-medium" title="Descartar cambios y recargar despensa.json desde el origen" aria-label="Recargar despensa desde el origen">
+                <button id="btnReloadSourceHeader" type="button" class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] px-3 py-2 rounded-xl transition font-medium" title="Descartar cambios y recargar despensa.json desde el origen" aria-label="Recargar despensa desde el origen">
                     <svg class="w-4 h-4 text-[#cac4d0] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
                     <span>Recargar</span>
                 </button>
 
-                <button id="btnCopyJsonHeader" type="button" class="hidden sm:flex text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] px-3 py-2 rounded-xl transition items-center gap-1.5 font-medium" title="Copiar el JSON al portapapeles" aria-label="Copiar JSON">
+                <div class="h-6 w-px bg-[#3e3c46] shrink-0 mx-0.5" aria-hidden="true"></div>
+
+                <button id="btnCopyJsonHeader" type="button" class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] px-3 py-2 rounded-xl transition font-medium" title="Copiar el JSON al portapapeles" aria-label="Copiar JSON">
                     <svg class="w-4 h-4 text-[#d0bcff] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                     </svg>
-                    <span class="hidden md:inline">Copiar JSON</span>
+                    <span>Copiar</span>
                 </button>
 
-                <button id="btnSaveJsonHeader" type="button" class="text-xs sm:text-sm bg-[#d0bcff] hover:bg-[#e0d0ff] active:scale-95 text-[#381e72] px-3 sm:px-4 py-2 rounded-xl shadow-lg shadow-purple-950/40 transition flex items-center gap-1.5 font-bold" title="Guardar despensa.json" aria-label="Guardar despensa.json">
+                <button id="btnSaveJsonHeader" type="button" class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm bg-[#d0bcff] hover:bg-[#e0d0ff] active:scale-95 text-[#381e72] px-3 sm:px-4 py-2 rounded-xl shadow-lg shadow-purple-950/40 transition font-bold" title="Guardar despensa.json" aria-label="Guardar despensa.json">
                     <svg class="w-4 h-4 shrink-0 text-[#381e72]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                     </svg>
-                    <span class="hidden sm:inline">Guardar JSON</span>
+                    <span>Guardar</span>
                 </button>
             </div>
         </div>

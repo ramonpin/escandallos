@@ -33,18 +33,18 @@
             </div>
 
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <button id="btnLoadDemo" type="button" class="flex shrink-0 items-center justify-center bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] p-2 sm:p-2.5 rounded-xl transition" title="Cargar receta de ejemplo profesional" aria-label="Cargar receta de ejemplo profesional">
+                    <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                    </svg>
+                </button>
+
                 <a href="./editor_despensa.html" class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] px-3 py-2 rounded-xl transition font-medium" title="Editar el catálogo despensa.json" aria-label="Editar despensa">
                     <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
                     <span>Despensa</span>
                 </a>
-
-                <button id="btnLoadDemo" type="button" class="flex shrink-0 items-center justify-center bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] p-2 sm:p-2.5 rounded-xl transition" title="Cargar receta de ejemplo profesional" aria-label="Cargar receta de ejemplo profesional">
-                    <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                    </svg>
-                </button>
             </div>
         </div>
 
@@ -55,7 +55,7 @@
                     <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                     </svg>
-                    <span>Cargar .md</span>
+                    <span>Cargar</span>
                 </button>
 
                 <button id="btnClearAll" type="button" class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm bg-[#2b2930] hover:bg-rose-950/60 hover:text-rose-200 hover:border-rose-700/60 active:scale-95 text-[#cac4d0] border border-[#3e3c46] px-3 py-2 rounded-xl transition font-medium" title="Vaciar formulario para nuevo escandallo" aria-label="Vaciar formulario">
@@ -71,14 +71,14 @@
                     <svg class="w-4 h-4 text-[#d0bcff] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                     </svg>
-                    <span>Copiar MD</span>
+                    <span>Copiar</span>
                 </button>
 
                 <button id="btnDownloadMd" type="button" class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm bg-[#d0bcff] hover:bg-[#e0d0ff] active:scale-95 text-[#381e72] px-3 sm:px-4 py-2 rounded-xl shadow-lg shadow-purple-950/40 transition font-bold" title="Seleccionar carpeta de destino del sistema y guardar .md" aria-label="Guardar nota en carpeta">
                     <svg class="w-4 h-4 shrink-0 text-[#381e72]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                     </svg>
-                    <span>Guardar .md en Carpeta...</span>
+                    <span>Guardar</span>
                 </button>
             </div>
         </div>
