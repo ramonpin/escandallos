@@ -182,12 +182,6 @@
                 <button id="btnClearFilters" type="button" class="hidden text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#cac4d0] border border-[#3e3c46] px-3 py-2.5 rounded-xl transition font-medium whitespace-nowrap" title="Quitar búsqueda, filtro y orden">
                     Limpiar filtros
                 </button>
-                <button id="btnAddItem" type="button" class="w-full lg:w-auto bg-amber-500 hover:bg-amber-400 active:scale-95 text-[#2a1700] text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 shrink-0" aria-label="Añadir un nuevo insumo">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <span>Nuevo Insumo</span>
-                </button>
             </div>
         </section>
 
@@ -232,6 +226,16 @@
             <!-- Tarjetas móviles -->
             <div id="pantryMobileList" class="md:hidden divide-y divide-[#2d2b35] bg-[#141218]">
                 <!-- Tarjetas generadas por JS -->
+            </div>
+
+            <!-- Alta de insumo al final de la lista -->
+            <div class="bg-[#211f26] border-t border-[#2d2b35] px-5 sm:px-6 py-4 flex justify-end no-print">
+                <button id="btnAddItem" type="button" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 active:scale-95 text-[#2a1700] text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 shrink-0" aria-label="Añadir un nuevo insumo">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Nuevo Insumo</span>
+                </button>
             </div>
 
             <!-- Pie del catálogo -->
