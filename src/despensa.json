@@ -8,7 +8,7 @@
     "unitPrice": 5
   },
   {
-    "categoria": "Grasas y Aceites",
+    "categoria": "Lácteos y Derivados",
     "name": "Mantequilla Extra 82% M.G.",
     "unit": "kg",
     "grossQty": 1,
@@ -53,7 +53,7 @@
     "unit": "L",
     "grossQty": 1,
     "wastePct": 0,
-    "unitPrice": 7
+    "unitPrice": 3.7
   },
   {
     "categoria": "Lácteos y Derivados",
@@ -105,7 +105,7 @@
   },
   {
     "categoria": "Embutidos",
-    "name": "Lomo embutido",
+    "name": "Lomo Embutido",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.1,
@@ -113,7 +113,7 @@
   },
   {
     "categoria": "Embutidos",
-    "name": "Chorizo fresco",
+    "name": "Chorizo Fresco",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.1,
@@ -121,7 +121,7 @@
   },
   {
     "categoria": "Embutidos",
-    "name": "Chorizo dulce",
+    "name": "Chorizo Dulce",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.1,
@@ -129,7 +129,7 @@
   },
   {
     "categoria": "Embutidos",
-    "name": "Chorizo rabioso",
+    "name": "Chorizo Rabioso",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.1,
@@ -137,7 +137,7 @@
   },
   {
     "categoria": "Embutidos",
-    "name": "Chorizo picante",
+    "name": "Chorizo Picante",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.1,
@@ -161,7 +161,7 @@
   },
   {
     "categoria": "Carnes y Aves",
-    "name": "Costilla adobada",
+    "name": "Costilla Adobada",
     "unit": "kg",
     "grossQty": 0.1,
     "wastePct": 1,
@@ -177,7 +177,7 @@
   },
   {
     "categoria": "Grasas y Aceites",
-    "name": "Aceite de orujo de oliva",
+    "name": "Aceite de Orujo de Oliva",
     "unit": "L",
     "grossQty": 1,
     "wastePct": 0.1,
@@ -185,7 +185,7 @@
   },
   {
     "categoria": "Grasas y Aceites",
-    "name": "aceite alto oleico",
+    "name": "Aceite Alto Oleico",
     "unit": "L",
     "grossQty": 1,
     "wastePct": 0.1,
@@ -193,7 +193,7 @@
   },
   {
     "categoria": "Lácteos y Derivados",
-    "name": "Queso de cabra",
+    "name": "Queso de Cabra",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.2,
@@ -201,7 +201,7 @@
   },
   {
     "categoria": "Lácteos y Derivados",
-    "name": "Queso cheddar",
+    "name": "Queso Cheddar",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.1,
@@ -209,7 +209,7 @@
   },
   {
     "categoria": "Harinas y Cereales",
-    "name": "Harina de trigo",
+    "name": "Harina de Trigo",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.1,
@@ -217,7 +217,7 @@
   },
   {
     "categoria": "Harinas y Cereales",
-    "name": "Pan rallado",
+    "name": "Pan Rallado",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.1,
@@ -233,7 +233,7 @@
   },
   {
     "categoria": "Carnes y Aves",
-    "name": "Carrillera cerdo",
+    "name": "Carrillera Cerdo",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.5,
@@ -241,10 +241,290 @@
   },
   {
     "categoria": "Carnes y Aves",
-    "name": "Patas cerdo",
+    "name": "Patas Cerdo",
     "unit": "kg",
     "grossQty": 1,
     "wastePct": 0.1,
     "unitPrice": 5
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Pimentón Dulce",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 11
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Pimentón Picante",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 11
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Cayena",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 35
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Comino",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 22
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Curry",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 11
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Cúrcuma",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 10
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Jengibre",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 16
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Nuez Moscada",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 30
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Ajo en Polvo",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 14
+  },
+  {
+    "categoria": "Verduras y Hortalizas",
+    "name": "Perejil Fresco",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 18.5
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Laurel",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 33
+  },
+  {
+    "categoria": "Harinas y Cereales",
+    "name": "Pan Brioche",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 7
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "Queso Crema",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 8
+  },
+  {
+    "categoria": "Harinas y Cereales",
+    "name": "Galletas",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 2.5
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "Nata 18% Cocinar",
+    "unit": "L",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 3.5
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "Queso Azul",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 13
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "Queso Mozarela Rallada",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 9
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "Queso Parmigiano Polvo",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 17
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "4 Quesos",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 11
+  },
+  {
+    "categoria": "Condimentos y Especias",
+    "name": "Soya",
+    "unit": "L",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 4
+  },
+  {
+    "categoria": "Legumbres",
+    "name": "Garbanzos",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 2.5
+  },
+  {
+    "categoria": "Legumbres",
+    "name": "Lentejas",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 2.7
+  },
+  {
+    "categoria": "Legumbres",
+    "name": "Judión",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 7.5
+  },
+  {
+    "categoria": "Legumbres",
+    "name": "Judía Pinta",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 0
+  },
+  {
+    "categoria": "Embutidos",
+    "name": "Virutas de Jamón",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 16
+  },
+  {
+    "categoria": "Legumbres",
+    "name": "Alubia Pinta",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 2.7
+  },
+  {
+    "categoria": "Conservas",
+    "name": "Atún",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 7.8
+  },
+  {
+    "categoria": "Conservas",
+    "name": "Tomate Frito",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 1.8
+  },
+  {
+    "categoria": "Harinas y Cereales",
+    "name": "Fideos Cabellín",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 10
+  },
+  {
+    "categoria": "Lácteos y Derivados",
+    "name": "Leche",
+    "unit": "L",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 1.5
+  },
+  {
+    "categoria": "Salsas y Vinagres",
+    "name": "Ketchup",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 2.5
+  },
+  {
+    "categoria": "Salsas y Vinagres",
+    "name": "Mostaza",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 3
+  },
+  {
+    "categoria": "Salsas y Vinagres",
+    "name": "Salsa Perris",
+    "unit": "L",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 2.5
+  },
+  {
+    "categoria": "Verduras y Hortalizas",
+    "name": "Pimiento Rojo",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.3,
+    "unitPrice": 5.5
+  },
+  {
+    "categoria": "Verduras y Hortalizas",
+    "name": "Pimiento Verde",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.3,
+    "unitPrice": 4.5
   }
 ]
