@@ -60,3 +60,19 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Notify Pushover
+        if: always()
+        continue-on-error: true
+        uses: ramonpin/pushover-action@main
+        with:
+          user_key: ${{ secrets.PUSHOVER_USER_KEY }}
+          api_token: ${{ secrets.PUSHOVER_API_TOKEN }}
+          title: "EscandalloPro deploy: ${{ job.status }}"
+          message: |
+            Estado: ${{ job.status }}
+            Rama: ${{ github.ref_name }}
+            Commit: ${{ github.event.head_commit.message || 'Manual deploy' }}
+            Autor: ${{ github.actor }}
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Web: ${{ steps.deployment.outputs.page_url || 'No disponible' }}
