@@ -32,16 +32,7 @@
                 </div>
             </div>
 
-            <button id="btnLoadDemo" type="button" class="flex shrink-0 items-center justify-center bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] p-2 sm:p-2.5 rounded-xl transition" title="Cargar receta de ejemplo profesional" aria-label="Cargar receta de ejemplo profesional">
-                <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Action Ribbon -->
-        <div class="border-t border-[#2d2b35] bg-[#191720]">
-            <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 flex items-center gap-1.5 sm:gap-2 overflow-x-auto">
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <a href="./editor_despensa.html" class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] px-3 py-2 rounded-xl transition font-medium" title="Editar el catálogo despensa.json" aria-label="Editar despensa">
                     <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -49,6 +40,17 @@
                     <span>Despensa</span>
                 </a>
 
+                <button id="btnLoadDemo" type="button" class="flex shrink-0 items-center justify-center bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] p-2 sm:p-2.5 rounded-xl transition" title="Cargar receta de ejemplo profesional" aria-label="Cargar receta de ejemplo profesional">
+                    <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Action Ribbon -->
+        <div class="border-t border-[#2d2b35] bg-[#191720]">
+            <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 flex items-center gap-1.5 sm:gap-2 overflow-x-auto">
                 <button id="btnImportMdHeader" type="button" class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] px-3 py-2 rounded-xl transition font-medium" title="Abrir y modificar un escandallo desde un archivo Markdown" aria-label="Abrir archivo Markdown">
                     <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
@@ -62,6 +64,8 @@
                     </svg>
                     <span>Limpiar</span>
                 </button>
+
+                <div class="h-6 w-px bg-[#3e3c46] shrink-0 mx-0.5" aria-hidden="true"></div>
 
                 <button id="btnCopyMdHeader" type="button" class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs sm:text-sm bg-[#2b2930] hover:bg-[#36343b] active:scale-95 text-[#e6e1e5] border border-[#3e3c46] px-3 sm:px-3.5 py-2 rounded-xl transition font-medium" title="Copiar Markdown al portapapeles" aria-label="Copiar Markdown">
                     <svg class="w-4 h-4 text-[#d0bcff] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
