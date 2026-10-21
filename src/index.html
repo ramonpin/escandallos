@@ -272,27 +272,13 @@
 
             <!-- 2. Desglose de Ingredientes y Mermas (Pantalla Completa) -->
             <section class="bg-[#1e1b24] rounded-2xl shadow-sm border border-[#2d2b35] overflow-hidden print-shadow-none">
-                <div class="px-5 sm:px-6 py-4 border-b border-[#2d2b35] bg-[#24222a] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="px-5 sm:px-6 py-4 border-b border-[#2d2b35] bg-[#24222a] flex items-center gap-3">
                     <div class="flex items-start sm:items-center gap-2.5">
                         <span class="w-7 h-7 rounded-xl bg-[#d0bcff] text-[#381e72] text-xs sm:text-sm font-bold flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">2</span>
                         <div class="min-w-0">
                             <h2 class="font-bold text-sm sm:text-base text-[#e6e1e5]">Matriz de Ingredientes, Pesos y Mermas</h2>
                             <p class="text-xs text-[#938f99] break-words mt-0.5">Fórmula técnica: <span class="font-mono text-amber-300 font-semibold">Peso Neto = Peso Bruto × (1 - %Merma/100)</span></p>
                         </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:flex items-center gap-2.5 w-full sm:w-auto no-print">
-                        <!-- Quick Add Common Ingredient Dropdown -->
-                        <select id="quickIngredientSelect" class="w-full sm:w-auto min-w-0 truncate text-xs sm:text-sm bg-[#141218] border border-[#3e3c46] rounded-xl px-3.5 py-2.5 text-[#e6e1e5] focus:outline-none focus:border-amber-400 font-medium" aria-label="Añadir insumo desde la despensa">
-                            <option value="">+ Añadir desde despensa...</option>
-                        </select>
-
-                        <button id="btnAddIngredient" type="button" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 active:scale-95 text-[#2a1700] text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 shrink-0" aria-label="Añadir línea en blanco de ingrediente">
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            <span>Añadir Línea en Blanco</span>
-                        </button>
                     </div>
                 </div>
 
@@ -322,6 +308,23 @@
                             <!-- Dynamic rows rendered via JS -->
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Add Ingredient Controls (Entre la tabla y los totales) -->
+                <div class="bg-[#211f26] border-t border-[#2d2b35] px-5 sm:px-6 py-4 no-print">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2.5">
+                        <!-- Quick Add Common Ingredient Dropdown -->
+                        <select id="quickIngredientSelect" class="w-full sm:w-80 min-w-0 truncate text-xs sm:text-sm bg-[#141218] border border-[#3e3c46] rounded-xl px-3.5 py-2.5 text-[#e6e1e5] focus:outline-none focus:border-amber-400 font-medium" aria-label="Añadir insumo desde la despensa">
+                            <option value="">+ Añadir desde despensa...</option>
+                        </select>
+
+                        <button id="btnAddIngredient" type="button" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 active:scale-95 text-[#2a1700] text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 shrink-0" aria-label="Añadir línea en blanco de ingrediente">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            <span>Añadir Línea en Blanco</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Shared Summary Footer for Both Mobile and Desktop -->
