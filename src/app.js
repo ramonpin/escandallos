@@ -778,9 +778,6 @@
 
             renderAllergens();
             renderIngredientsTable();
-            if (cachedPantry && cachedPantry.length > 0) {
-                renderPantrySelect(cachedPantry);
-            }
             recalculateAndSync();
         }
 
@@ -1224,13 +1221,85 @@
         }
 
         let cachedPantry = [];
+        let pantryLoadState = 'loading';
+        let pantryVisibleResults = [];
+        let activePantryIndex = -1;
+        let pantryResultsOpen = false;
+        let suppressPantryFocusOpen = false;
 
         /**
-         * Loads the external pantry from despensa.json served from origin
+         * Normaliza un insumo de la despensa para poder incorporarlo al escandallo.
+         */
+        function normalizePantryItem(raw) {
+            const src = raw && typeof raw === 'object' ? raw : {};
+            const name = formatTitleCase(String(src.name ?? '').trim());
+            if (!name) return null;
+
+            const grossQty = Math.max(0, parseLocaleFloat(src.grossQty));
+            const wastePct = Math.min(99.9, Math.max(0, parseLocaleFloat(src.wastePct)));
+
+            return {
+                categoria: formatTitleCase(String(src.categoria ?? '').trim()),
+                name,
+                unit: String(src.unit ?? 'kg').trim() || 'kg',
+                grossQty: roundTo(grossQty > 0 ? grossQty : 0.1, INGREDIENT_FIELD_DECIMALS.grossQty),
+                wastePct,
+                unitPrice: roundTo(Math.max(0, parseLocaleFloat(src.unitPrice)), INGREDIENT_FIELD_DECIMALS.unitPrice)
+            };
+        }
+
+        /**
+         * Búsqueda tolerante a tildes por nombre, categoría y unidad.
+         * Los resultados que empiezan por el término buscado aparecen primero.
+         */
+        function filterPantryItems(items, query = '') {
+            const list = Array.isArray(items) ? items : [];
+            const tokens = foldText(query).split(/\s+/).filter(Boolean);
+
+            const entries = list.map(raw => {
+                const item = normalizePantryItem(raw);
+                if (!item) return null;
+                const nameFold = foldText(item.name);
+                const categoryFold = foldText(item.categoria);
+                return {
+                    item,
+                    nameFold,
+                    categoryFold,
+                    haystack: `${nameFold} ${categoryFold} ${foldText(item.unit)}`
+                };
+            }).filter(Boolean);
+
+            const filtered = tokens.length > 0
+                ? entries.filter(entry => tokens.every(token => entry.haystack.includes(token)))
+                : entries;
+
+            filtered.sort((a, b) => {
+                if (tokens.length > 0) {
+                    const aStarts = a.nameFold.startsWith(tokens[0]) ? 0 : 1;
+                    const bStarts = b.nameFold.startsWith(tokens[0]) ? 0 : 1;
+                    if (aStarts !== bStarts) return aStarts - bStarts;
+
+                    const aPosition = a.nameFold.indexOf(tokens[0]);
+                    const bPosition = b.nameFold.indexOf(tokens[0]);
+                    if (aPosition !== bPosition) return aPosition - bPosition;
+                }
+
+                return a.categoryFold.localeCompare(b.categoryFold, 'es', { sensitivity: 'base' })
+                    || a.nameFold.localeCompare(b.nameFold, 'es', { sensitivity: 'base' });
+            });
+
+            return filtered.map(entry => entry.item);
+        }
+
+        /**
+         * Carga la despensa externa desde despensa.json servido en el origen.
          */
         async function loadExternalPantry() {
-            const select = document.getElementById('quickIngredientSelect');
-            if (!select) return;
+            const input = document.getElementById('pantrySearchInput');
+            if (!input) return;
+
+            pantryLoadState = 'loading';
+            refreshPantryResults();
 
             try {
                 // Fetch desde el mismo origen sin caché para obtener siempre los precios/insumos más recientes
@@ -1239,70 +1308,378 @@
                     throw new Error(`HTTP ${response.status}`);
                 }
                 const items = await response.json();
-                if (Array.isArray(items) && items.length > 0) {
-                    cachedPantry = items;
-                    renderPantrySelect(cachedPantry);
-                }
+                cachedPantry = Array.isArray(items) ? items : [];
+                pantryLoadState = 'ready';
             } catch (err) {
+                pantryLoadState = 'error';
                 console.warn('No se pudo cargar despensa.json desde el origen:', err);
+            }
+
+            refreshPantryResults();
+        }
+
+        function buildFreeIngredientButton(query) {
+            const cleanQuery = String(query ?? '').trim();
+            if (!cleanQuery) return '';
+            const displayName = formatTitleCase(cleanQuery);
+
+            return `
+                <button type="button" data-pantry-action="create" data-pantry-query="${escapeHtml(cleanQuery)}" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-[#2a1700] text-xs font-bold transition">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Crear ingrediente libre «${escapeHtml(displayName)}»</span>
+                </button>`;
+        }
+
+        function setPantryActiveIndex(index, scroll = true) {
+            const input = document.getElementById('pantrySearchInput');
+            const results = document.getElementById('pantrySearchResults');
+            if (!input || !results) return;
+
+            const options = Array.from(results.querySelectorAll('[role="option"]'));
+            if (options.length === 0) {
+                activePantryIndex = -1;
+                input.removeAttribute('aria-activedescendant');
+                return;
+            }
+
+            if (index < 0) index = options.length - 1;
+            if (index >= options.length) index = 0;
+            activePantryIndex = index;
+
+            options.forEach((option, optionIndex) => {
+                const isActive = optionIndex === index;
+                option.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                option.classList.toggle('bg-[#2f293a]', isActive);
+                option.classList.toggle('ring-1', isActive);
+                option.classList.toggle('ring-inset', isActive);
+                option.classList.toggle('ring-amber-400/20', isActive);
+            });
+
+            const activeOption = options[index];
+            input.setAttribute('aria-activedescendant', activeOption.id);
+
+            if (scroll) {
+                const top = activeOption.offsetTop;
+                const bottom = top + activeOption.offsetHeight;
+                if (top < results.scrollTop) {
+                    results.scrollTop = top;
+                } else if (bottom > results.scrollTop + results.clientHeight) {
+                    results.scrollTop = bottom - results.clientHeight;
+                }
             }
         }
 
         /**
-         * Renders categorized or flat pantry options in the quickIngredientSelect dropdown
+         * Renderiza los resultados del buscador de despensa.
          */
-        function renderPantrySelect(items) {
-            const select = document.getElementById('quickIngredientSelect');
-            if (!select) return;
+        function renderPantryResults(query = '') {
+            const resultsEl = document.getElementById('pantrySearchResults');
+            const hint = document.getElementById('pantrySearchHint');
+            if (!resultsEl) return;
 
-            select.innerHTML = '<option value="">+ Añadir desde despensa...</option>';
+            const search = String(query ?? '');
+            const freeButton = buildFreeIngredientButton(search);
 
-            const groups = {};
-            const ungrouped = [];
+            if (pantryLoadState === 'loading') {
+                pantryVisibleResults = [];
+                resultsEl.innerHTML = `
+                    <div class="px-4 py-6 text-center text-xs text-[#938f99] flex items-center justify-center gap-2">
+                        <span class="w-4 h-4 border-2 border-[#49454f] border-t-amber-400 rounded-full animate-spin" aria-hidden="true"></span>
+                        <span>Cargando despensa…</span>
+                    </div>`;
+                if (hint) hint.textContent = 'Cargando la despensa.';
+                setPantryActiveIndex(-1, false);
+                return;
+            }
 
-            items.forEach(item => {
-                if (!item || !item.name) return;
-                const cat = (item.categoria || '').trim();
-                if (cat) {
-                    if (!groups[cat]) groups[cat] = [];
-                    groups[cat].push(item);
-                } else {
-                    ungrouped.push(item);
-                }
-            });
+            if (pantryLoadState === 'error') {
+                pantryVisibleResults = [];
+                resultsEl.innerHTML = `
+                    <div class="px-4 py-5 text-center space-y-3">
+                        <p class="text-xs text-[#f0c9a0]">No se pudo cargar la despensa.</p>
+                        <div class="flex flex-wrap items-center justify-center gap-2">
+                            <button type="button" data-pantry-action="retry" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#2b2930] hover:bg-[#36343b] text-[#e6e1e5] border border-[#3e3c46] text-xs font-semibold transition">
+                                Reintentar
+                            </button>
+                            ${freeButton}
+                        </div>
+                    </div>`;
+                if (hint) hint.textContent = 'No se pudo cargar la despensa.';
+                setPantryActiveIndex(-1, false);
+                return;
+            }
 
-            const sym = state.currencySymbol || '€';
-            const buildOption = (item) => {
-                const opt = document.createElement('option');
-                const gross = Math.max(0, parseFloat(item.grossQty) || 0.1);
-                const waste = Math.min(99.9, Math.max(0, parseFloat(item.wastePct) || 0));
-                const price = Math.max(0, parseFloat(item.unitPrice) || 0);
-                const unit = (item.unit || 'kg').trim();
-                const name = (item.name || '').trim();
+            pantryVisibleResults = filterPantryItems(cachedPantry, search);
+            const total = pantryVisibleResults.length;
+            resultsEl.scrollTop = 0;
 
-                opt.value = `${name}|${unit}|${gross}|${waste}|${price}`;
+            if (total === 0) {
+                const emptyMessage = search.trim()
+                    ? `No hay coincidencias para «<span class="text-[#e6e1e5] font-medium">${escapeHtml(search.trim())}</span>».`
+                    : 'La despensa no contiene insumos.';
+                resultsEl.innerHTML = `
+                    <div class="px-4 py-5 text-center space-y-3">
+                        <p class="text-xs text-[#938f99]">${emptyMessage}</p>
+                        ${freeButton}
+                    </div>`;
+                if (hint) hint.textContent = 'No hay resultados en la despensa.';
+                setPantryActiveIndex(-1, false);
+                return;
+            }
 
-                let label = `${name} (${formatNumber(price, INGREDIENT_FIELD_DECIMALS.unitPrice)} ${sym}/${unit})`;
-                if (waste > 0) {
-                    label = `${name} (${formatNumber(waste, 0)}% merma · ${formatNumber(price, INGREDIENT_FIELD_DECIMALS.unitPrice)} ${sym}/${unit})`;
-                }
-                opt.textContent = label;
-                return opt;
-            };
+            const sym = escapeHtml(state.currencySymbol || '€');
+            const headerLabel = search.trim()
+                ? `${total} resultado${total === 1 ? '' : 's'}`
+                : `${total} insumo${total === 1 ? '' : 's'} en la despensa`;
 
-            // Grupos por categoría
-            Object.keys(groups).sort().forEach(catName => {
-                const optgroup = document.createElement('optgroup');
-                optgroup.label = catName;
-                groups[catName].forEach(item => {
-                    optgroup.appendChild(buildOption(item));
+            const rows = pantryVisibleResults.map((item, index) => {
+                const priceLabel = `${formatNumber(item.unitPrice, INGREDIENT_FIELD_DECIMALS.unitPrice)} ${sym}/${escapeHtml(item.unit)}`;
+                const wasteLabel = item.wastePct > 0
+                    ? `Merma ${formatNumber(item.wastePct, 1)}%`
+                    : 'Sin merma';
+                const categoryLabel = item.categoria || 'Sin categoría';
+
+                return `
+                    <button type="button" role="option" id="pantryOption${index}" data-pantry-action="select" data-pantry-index="${index}" aria-selected="${index === 0 ? 'true' : 'false'}" class="w-full text-left px-3.5 py-2.5 flex items-start gap-3 border-b border-[#2d2b35] last:border-0 hover:bg-[#2b2930] focus:outline-none transition ${index === 0 ? 'bg-[#2f293a] ring-1 ring-inset ring-amber-400/20' : ''}">
+                        <span class="min-w-0 flex-1">
+                            <span class="block truncate text-sm font-semibold text-[#f3eff4]">${escapeHtml(item.name)}</span>
+                            <span class="mt-0.5 block truncate text-[11px] text-[#938f99]">${escapeHtml(categoryLabel)} · ${escapeHtml(item.unit)}</span>
+                        </span>
+                        <span class="shrink-0 text-right">
+                            <span class="block font-mono text-xs font-semibold text-amber-300">${priceLabel}</span>
+                            <span class="mt-0.5 block text-[10px] text-[#938f99]">${wasteLabel}</span>
+                        </span>
+                    </button>`;
+            }).join('');
+
+            resultsEl.innerHTML = `
+                <div class="sticky top-0 z-10 px-3.5 py-1.5 bg-[#1b191f]/95 backdrop-blur-sm border-b border-[#2d2b35] flex items-center justify-between gap-2 text-[10px] uppercase tracking-wider text-[#79747e]">
+                    <span>${headerLabel}</span>
+                    <span class="normal-case tracking-normal">↑↓ mover · Enter añadir</span>
+                </div>
+                ${rows}`;
+
+            if (hint) {
+                hint.textContent = `${total} resultado${total === 1 ? '' : 's'} disponible${total === 1 ? '' : 's'} en la despensa.`;
+            }
+            setPantryActiveIndex(0, false);
+        }
+
+        function openPantryResults() {
+            const input = document.getElementById('pantrySearchInput');
+            const results = document.getElementById('pantrySearchResults');
+            if (!input || !results) return;
+
+            results.classList.remove('hidden');
+            pantryResultsOpen = true;
+            input.setAttribute('aria-expanded', 'true');
+            renderPantryResults(input.value);
+        }
+
+        function closePantryResults() {
+            const input = document.getElementById('pantrySearchInput');
+            const results = document.getElementById('pantrySearchResults');
+            if (!input || !results) return;
+
+            results.classList.add('hidden');
+            pantryResultsOpen = false;
+            activePantryIndex = -1;
+            input.setAttribute('aria-expanded', 'false');
+            input.removeAttribute('aria-activedescendant');
+        }
+
+        function refreshPantryResults() {
+            if (!pantryResultsOpen) return;
+            const input = document.getElementById('pantrySearchInput');
+            if (input) renderPantryResults(input.value);
+        }
+
+        function updatePantryClearButton() {
+            const input = document.getElementById('pantrySearchInput');
+            const button = document.getElementById('btnClearPantrySearch');
+            if (!input || !button) return;
+            button.classList.toggle('hidden', input.value.length === 0);
+        }
+
+        function addPantryItemToRecipe(rawItem) {
+            const item = normalizePantryItem(rawItem);
+            if (!item) return false;
+
+            const existing = state.ingredients.find(ing => (
+                foldText(ing.name) === foldText(item.name)
+                && String(ing.unit || '').trim() === item.unit
+            ));
+
+            if (existing) {
+                const nextGross = roundTo(
+                    Math.max(0, parseLocaleFloat(existing.grossQty)) + item.grossQty,
+                    INGREDIENT_FIELD_DECIMALS.grossQty
+                );
+                existing.grossQty = nextGross;
+                showToast(`«${item.name}» ya estaba en el escandallo. Cantidad incrementada a ${formatNumber(nextGross, INGREDIENT_FIELD_DECIMALS.grossQty)} ${item.unit}.`);
+            } else {
+                state.ingredients.push({
+                    id: generateId(),
+                    name: item.name,
+                    grossQty: item.grossQty,
+                    unit: item.unit,
+                    wastePct: item.wastePct,
+                    unitPrice: item.unitPrice
                 });
-                select.appendChild(optgroup);
+                showToast(`Insumo «${item.name}» añadido al escandallo.`);
+            }
+
+            renderIngredientsTable();
+            recalculateAndSync();
+            return true;
+        }
+
+        function addFreeIngredientFromQuery(query) {
+            const name = formatTitleCase(String(query ?? '').trim());
+            if (!name) return;
+
+            state.ingredients.push({
+                id: generateId(),
+                name,
+                grossQty: 0.100,
+                unit: 'kg',
+                wastePct: 0,
+                unitPrice: 0
+            });
+            renderIngredientsTable();
+            recalculateAndSync();
+            showToast(`Ingrediente libre «${name}» añadido. Indica cantidad, unidad y precio.`);
+        }
+
+        function focusPantrySearchWithoutOpening() {
+            const input = document.getElementById('pantrySearchInput');
+            if (!input) return;
+            suppressPantryFocusOpen = true;
+            input.focus();
+            setTimeout(() => { suppressPantryFocusOpen = false; }, 0);
+        }
+
+        function selectPantryResult(index) {
+            const item = pantryVisibleResults[index];
+            if (!item) return;
+
+            addPantryItemToRecipe(item);
+
+            const input = document.getElementById('pantrySearchInput');
+            if (input) {
+                input.value = '';
+                updatePantryClearButton();
+                closePantryResults();
+                focusPantrySearchWithoutOpening();
+            } else {
+                closePantryResults();
+            }
+        }
+
+        function onPantrySearchKeydown(event) {
+            const input = event.target;
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                if (!pantryResultsOpen) {
+                    openPantryResults();
+                } else {
+                    setPantryActiveIndex(activePantryIndex + 1);
+                }
+                return;
+            }
+
+            if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                if (!pantryResultsOpen) {
+                    openPantryResults();
+                } else {
+                    setPantryActiveIndex(activePantryIndex - 1);
+                }
+                return;
+            }
+
+            if (event.key === 'Enter') {
+                if (pantryResultsOpen && activePantryIndex >= 0) {
+                    event.preventDefault();
+                    selectPantryResult(activePantryIndex);
+                }
+                return;
+            }
+
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                if (pantryResultsOpen) {
+                    closePantryResults();
+                } else if (input.value) {
+                    input.value = '';
+                    updatePantryClearButton();
+                }
+                return;
+            }
+
+            if (event.key === 'Tab') {
+                closePantryResults();
+            }
+        }
+
+        function bindPantryPickerEvents() {
+            const picker = document.getElementById('pantryPicker');
+            const input = document.getElementById('pantrySearchInput');
+            const results = document.getElementById('pantrySearchResults');
+            const clearButton = document.getElementById('btnClearPantrySearch');
+            if (!picker || !input || !results) return;
+
+            input.addEventListener('focus', () => {
+                if (!suppressPantryFocusOpen) openPantryResults();
+            });
+            input.addEventListener('click', () => {
+                if (!pantryResultsOpen) openPantryResults();
+            });
+            input.addEventListener('input', () => {
+                updatePantryClearButton();
+                openPantryResults();
+            });
+            input.addEventListener('keydown', onPantrySearchKeydown);
+
+            clearButton?.addEventListener('click', () => {
+                input.value = '';
+                updatePantryClearButton();
+                input.focus();
+                openPantryResults();
             });
 
-            // Elementos sin categoría
-            ungrouped.forEach(item => {
-                select.appendChild(buildOption(item));
+            // Evita que el input pierda el foco antes de procesar el clic en una opción.
+            results.addEventListener('mousedown', (event) => {
+                if (event.target.closest('[data-pantry-action]')) event.preventDefault();
+            });
+
+            results.addEventListener('click', (event) => {
+                const actionEl = event.target.closest('[data-pantry-action]');
+                if (!actionEl) return;
+
+                const action = actionEl.dataset.pantryAction;
+                if (action === 'retry') {
+                    loadExternalPantry();
+                    return;
+                }
+                if (action === 'create') {
+                    const query = actionEl.dataset.pantryQuery || input.value;
+                    addFreeIngredientFromQuery(query);
+                    input.value = '';
+                    updatePantryClearButton();
+                    closePantryResults();
+                    focusPantrySearchWithoutOpening();
+                    return;
+                }
+                if (action === 'select') {
+                    selectPantryResult(Number(actionEl.dataset.pantryIndex));
+                }
+            });
+
+            document.addEventListener('pointerdown', (event) => {
+                if (!picker.contains(event.target)) closePantryResults();
             });
         }
 
@@ -1329,6 +1706,7 @@
             }
 
             populateFormInputs();
+            bindPantryPickerEvents();
             loadExternalPantry();
 
             // Bind Top-Level Input Listeners
@@ -1341,9 +1719,7 @@
                     state[id] = e.target.value;
                     if (id === 'currencySymbol') {
                         renderIngredientsTable();
-                        if (cachedPantry.length > 0) {
-                            renderPantrySelect(cachedPantry);
-                        }
+                        refreshPantryResults();
                     }
                     recalculateAndSync();
                 });
@@ -1419,24 +1795,6 @@
 
             document.getElementById('btnAddIngredient').addEventListener('click', addEmptyIngredientLine);
             document.getElementById('btnMobileAddIng').addEventListener('click', addEmptyIngredientLine);
-
-            // Quick Ingredient Selector
-            document.getElementById('quickIngredientSelect').addEventListener('change', (e) => {
-                if (!e.target.value) return;
-                const [name, unit, grossQty, wastePct, unitPrice] = e.target.value.split('|');
-                state.ingredients.push({
-                    id: generateId(),
-                    name: formatTitleCase(name),
-                    unit,
-                    grossQty: parseFloat(grossQty),
-                    wastePct: parseFloat(wastePct),
-                    unitPrice: roundTo(parseFloat(unitPrice), INGREDIENT_FIELD_DECIMALS.unitPrice)
-                });
-                e.target.value = '';
-                renderIngredientsTable();
-                recalculateAndSync();
-                showToast(`Insumo "${formatTitleCase(name)}" añadido al escandallo.`);
-            });
 
             // Load Demo Button
             document.getElementById('btnLoadDemo').addEventListener('click', () => {
@@ -1514,6 +1872,8 @@
                 formatCurrency,
                 formatUnitPrice,
                 roundTo,
+                normalizePantryItem,
+                filterPantryItems,
                 INGREDIENT_FIELD_DECIMALS,
                 parseLocaleFloat,
                 computeIngredientMetrics,

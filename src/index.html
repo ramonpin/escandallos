@@ -317,10 +317,23 @@
                 <!-- Add Ingredient Controls (Entre la tabla y los totales) -->
                 <div class="bg-[#211f26] border-t border-[#2d2b35] px-5 sm:px-6 py-4 no-print">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2.5">
-                        <!-- Quick Add Common Ingredient Dropdown -->
-                        <select id="quickIngredientSelect" class="w-full sm:w-80 min-w-0 truncate text-xs sm:text-sm bg-[#141218] border border-[#3e3c46] rounded-xl px-3.5 py-2.5 text-[#e6e1e5] focus:outline-none focus:border-amber-400 font-medium" aria-label="Añadir insumo desde la despensa">
-                            <option value="">+ Añadir desde despensa...</option>
-                        </select>
+                        <!-- Quick Add Common Ingredient Combobox -->
+                        <div id="pantryPicker" class="relative w-full sm:w-96">
+                            <label for="pantrySearchInput" class="sr-only">Buscar insumo en la despensa</label>
+                            <div class="relative">
+                                <svg class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#938f99]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                                <input id="pantrySearchInput" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="pantrySearchResults" aria-describedby="pantrySearchHint" placeholder="Buscar insumo en la despensa..." class="w-full min-w-0 pl-9 pr-9 py-2.5 bg-[#141218] border border-[#3e3c46] rounded-xl text-xs sm:text-sm text-[#e6e1e5] placeholder:text-[#79747e] focus:outline-none focus:border-amber-400 font-medium transition">
+                                <button id="btnClearPantrySearch" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-[#938f99] hover:text-[#f3eff4] hover:bg-[#36343b] transition" aria-label="Limpiar búsqueda de despensa" title="Limpiar búsqueda">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p id="pantrySearchHint" class="sr-only" aria-live="polite"></p>
+                            <div id="pantrySearchResults" role="listbox" aria-label="Resultados de la despensa" class="hidden absolute bottom-full left-0 right-0 z-40 mb-2 max-h-80 overflow-y-auto rounded-xl border border-[#3e3c46] bg-[#211f26] shadow-2xl shadow-black/60"></div>
+                        </div>
 
                         <button id="btnAddIngredient" type="button" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 active:scale-95 text-[#2a1700] text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 shrink-0" aria-label="Añadir línea en blanco de ingrediente">
                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -5,6 +5,8 @@ const {
     formatCurrency,
     formatUnitPrice,
     formatTitleCase,
+    normalizePantryItem,
+    filterPantryItems,
     INGREDIENT_FIELD_DECIMALS,
     parseLocaleFloat,
     escapeYaml,
@@ -73,6 +75,46 @@ describe('Formateo, sanitización y funciones de utilidad', () => {
             assert.strictEqual(formatTitleCase('nata culinaria 35% M.G.'), 'Nata Culinaria 35% M.G.');
             assert.strictEqual(formatTitleCase('sub-receta / base'), 'Sub-Receta / Base');
             assert.strictEqual(formatTitleCase(''), '');
+        });
+    });
+
+    describe('Buscador de despensa', () => {
+        const pantry = [
+            { categoria: 'Verduras y Hortalizas', name: 'Cebolla Dulce', unit: 'kg', grossQty: 1, wastePct: 15, unitPrice: 0.9234 },
+            { categoria: 'Grasas y Aceites', name: 'Aceite de Oliva Virgen Extra', unit: 'L', grossQty: 1, wastePct: 0, unitPrice: 9.2345 },
+            { categoria: 'Carnes y Aves', name: 'Pechuga de Pollo', unit: 'kg', grossQty: 1, wastePct: 5, unitPrice: 6.7891 },
+            { categoria: 'Verduras y Hortalizas', name: 'Ajo Morado', unit: 'kg', grossQty: 1, wastePct: 20, unitPrice: 3 }
+        ];
+
+        it('normaliza el insumo y mantiene cuatro decimales en el precio unitario', () => {
+            const item = normalizePantryItem({
+                categoria: 'grasas y aceites',
+                name: 'aceite de oliva virgen extra',
+                unit: 'L',
+                grossQty: '1,5',
+                wastePct: '0',
+                unitPrice: '9,23456'
+            });
+
+            assert.equal(item.categoria, 'Grasas y Aceites');
+            assert.equal(item.name, 'Aceite de Oliva Virgen Extra');
+            assert.equal(item.unit, 'L');
+            assert.equal(item.grossQty, 1.5);
+            assert.equal(item.unitPrice, 9.2346);
+        });
+
+        it('busca por nombre y categoría sin distinguir tildes ni mayúsculas', () => {
+            assert.deepEqual(filterPantryItems(pantry, 'cebolla').map(i => i.name), ['Cebolla Dulce']);
+            assert.deepEqual(filterPantryItems(pantry, 'ACEITE').map(i => i.name), ['Aceite de Oliva Virgen Extra']);
+            assert.deepEqual(filterPantryItems(pantry, 'verduras').map(i => i.name), ['Ajo Morado', 'Cebolla Dulce']);
+            assert.deepEqual(filterPantryItems(pantry, 'pollo').map(i => i.name), ['Pechuga de Pollo']);
+        });
+
+        it('prioriza los nombres que empiezan por el término buscado', () => {
+            const results = filterPantryItems(pantry, 'aceite');
+            assert.equal(results[0].name, 'Aceite de Oliva Virgen Extra');
+            assert.equal(filterPantryItems(pantry, '').length, pantry.length);
+            assert.deepEqual(filterPantryItems(pantry, 'inexistente'), []);
         });
     });
 
