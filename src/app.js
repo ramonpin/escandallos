@@ -64,10 +64,58 @@
         }
 
         /**
+         * Capitalización de nombres con la misma lógica que el editor de despensa:
+         * formato título respetando artículos, conjunciones y preposiciones menores.
+         */
+        function foldText(str) {
+            return String(str ?? '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim();
+        }
+
+        const MINOR_TITLE_WORDS = new Set([
+            // Artículos
+            'el', 'la', 'los', 'las', 'lo', 'un', 'una', 'unos', 'unas',
+            // Conjunciones
+            'y', 'e', 'o', 'u', 'ni', 'que', 'pero', 'sino', 'aunque', 'como',
+            'cuando', 'donde', 'mientras', 'pues',
+            // Preposiciones y contracciones habituales
+            'a', 'al', 'de', 'del', 'en', 'con', 'sin', 'por', 'para',
+            'sobre', 'entre', 'hacia', 'hasta', 'desde', 'bajo', 'contra',
+            'durante', 'mediante', 'según'
+        ]);
+
+        const TITLE_WORD_PATTERN = /[\p{L}\p{N}][\p{L}\p{N}'’.]*/gu;
+        const TITLE_ACRONYM_PATTERN = /^(?:\p{Lu}{1,}\.)+\p{Lu}{0,}\.?$/u;
+
+        function capitalizeTitleToken(token) {
+            if (/\p{N}/u.test(token) || TITLE_ACRONYM_PATTERN.test(token)) return token;
+            const lower = token.toLocaleLowerCase('es');
+            return lower.charAt(0).toLocaleUpperCase('es') + lower.slice(1);
+        }
+
+        function formatTitleCase(value) {
+            const text = String(value ?? '').trim().replace(/\s+/g, ' ');
+            if (!text) return '';
+
+            let position = 0;
+            return text.replace(TITLE_WORD_PATTERN, token => {
+                const isFirst = position === 0;
+                position += 1;
+                if (!isFirst && MINOR_TITLE_WORDS.has(foldText(token))) {
+                    return token.toLocaleLowerCase('es');
+                }
+                return capitalizeTitleToken(token);
+            });
+        }
+
+        /**
          * Default Demo Recipe (Carrillera Ibérica al Oporto)
          */
         function getDemoState() {
-            return {
+            const demo = {
                 recipeName: 'Carrillera Ibérica Glaseada al Oporto con Parmentier Trufado',
                 recipeCode: 'ESC-CAR-014',
                 recipeCategory: 'Plato Principal - Carnes',
@@ -97,6 +145,12 @@
                 recipeSteps: `1. Limpiar las carrilleras retirando el exceso de grasa exterior y la aponeurosis superficial (aprox. 12% de merma).\n2. Salpimentar y marcar a fuego vivo en rondeau con AOVE hasta lograr una reacción de Maillard uniforme. Retirar y reservar.\n3. En la misma grasa, pochar la bresa de verduras (cebolla, zanahoria y apio en mirepoix) durante 25 minutos.\n4. Desglasar con el vino de Oporto y reducir a seco hasta un tercio de su volumen.\n5. Reincorporar las carrilleras, mojar con el fondo oscuro y estofar a fuego suave (o en horno mixto a 145°C tapado) durante 2 horas hasta que estén tiernas.\n6. Colar la salsa por chino fino, desgrasar y reducir hasta textura napante.\n7. Cocer la patata con piel en agua salada, pelar en caliente, pasar por pasapurés y emulsionar con la mantequilla fría en dados y la pasta de trufa.`,
                 recipePlating: `En plato hondo de gres oscuro caliente, trazar una lágrima generosa de parmentier trufado (140 g/ración). Disponer 2 piezas y media de carrillera glaseada encima (aprox. 180 g netos en crudo) y salsear con el jugo de Oporto brillante. Decorar con brotes de mostaza frisée.`,
                 recipeConservation: `Enfriamiento rápido en abatidor de temperatura a +3°C en menos de 90 min. Envasar las carrilleras con su salsa en bolsas de vacío de 5 raciones. Conservación en cámara a 2°C durante 14 días.`
+            };
+
+            return {
+                ...demo,
+                recipeName: formatTitleCase(demo.recipeName),
+                ingredients: demo.ingredients.map(ing => ({ ...ing, name: formatTitleCase(ing.name) }))
             };
         }
 
@@ -575,6 +629,22 @@
                             input.addEventListener('blur', formatNumericField);
                             input.addEventListener('change', formatNumericField);
                         }
+
+                        // Aplicar la misma capitalización tipo título que en la despensa.
+                        if (field === 'name') {
+                            const formatNameField = (e) => {
+                                const formatted = formatTitleCase(e.target.value);
+                                ing.name = formatted;
+                                e.target.value = formatted;
+                                const partnerInput = partnerEl.querySelector('[data-field="name"]');
+                                if (partnerInput && partnerInput !== e.target) {
+                                    partnerInput.value = formatted;
+                                }
+                                recalculateAndSync();
+                            };
+                            input.addEventListener('blur', formatNameField);
+                            input.addEventListener('change', formatNameField);
+                        }
                     });
 
                     containerEl.querySelector('[data-action="remove"]').addEventListener('click', () => {
@@ -951,7 +1021,7 @@
                     hasWikiLinks = true;
                     rawName = rawName.replace(/\[\[(.*?)\]\]/g, '$1');
                 }
-                const name = rawName.replace(/\*\*/g, '').trim();
+                const name = formatTitleCase(rawName.replace(/\*\*/g, '').trim());
                 const grossQty = parseLocaleFloat(row[2]);
                 const unit = (row[3] || 'kg').replace(/[`*]/g, '').trim();
                 const wastePct = parseLocaleFloat(row[4]);
@@ -1031,7 +1101,7 @@
             const hasCallouts = />\s*\[!/.test(body);
 
             return {
-                recipeName: recipeName || '',
+                recipeName: formatTitleCase(recipeName || ''),
                 recipeCode: recipeCode || 'ESC-001',
                 recipeCategory: recipeCategory || 'Plato Principal - Carnes',
                 recipeChef: recipeChef || '',
@@ -1243,7 +1313,15 @@
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     if (parsed && Array.isArray(parsed.ingredients)) {
-                        state = { ...getDemoState(), ...parsed };
+                        const merged = { ...getDemoState(), ...parsed };
+                        state = {
+                            ...merged,
+                            recipeName: formatTitleCase(merged.recipeName || ''),
+                            ingredients: merged.ingredients.map(ing => ({
+                                ...ing,
+                                name: formatTitleCase(ing.name)
+                            }))
+                        };
                     }
                 }
             } catch (e) {
@@ -1270,6 +1348,17 @@
                     recalculateAndSync();
                 });
             });
+
+            // Aplicar la misma capitalización tipo título que en la despensa al nombre de la receta.
+            const recipeNameInput = document.getElementById('recipeName');
+            const formatRecipeNameField = (e) => {
+                const formatted = formatTitleCase(e.target.value);
+                e.target.value = formatted;
+                state.recipeName = formatted;
+                recalculateAndSync();
+            };
+            recipeNameInput.addEventListener('blur', formatRecipeNameField);
+            recipeNameInput.addEventListener('change', formatRecipeNameField);
 
             const integerInputs = ['recipeTime', 'recipePortions', 'taxRate'];
             integerInputs.forEach(id => {
@@ -1337,7 +1426,7 @@
                 const [name, unit, grossQty, wastePct, unitPrice] = e.target.value.split('|');
                 state.ingredients.push({
                     id: generateId(),
-                    name,
+                    name: formatTitleCase(name),
                     unit,
                     grossQty: parseFloat(grossQty),
                     wastePct: parseFloat(wastePct),
@@ -1346,7 +1435,7 @@
                 e.target.value = '';
                 renderIngredientsTable();
                 recalculateAndSync();
-                showToast(`Insumo "${name}" añadido al escandallo.`);
+                showToast(`Insumo "${formatTitleCase(name)}" añadido al escandallo.`);
             });
 
             // Load Demo Button
@@ -1420,6 +1509,7 @@
                 escapeYaml,
                 escapeMdCell,
                 escapeHtml,
+                formatTitleCase,
                 formatNumber,
                 formatCurrency,
                 formatUnitPrice,

@@ -4,6 +4,7 @@ const {
     formatNumber,
     formatCurrency,
     formatUnitPrice,
+    formatTitleCase,
     INGREDIENT_FIELD_DECIMALS,
     parseLocaleFloat,
     escapeYaml,
@@ -60,6 +61,18 @@ describe('Formateo, sanitización y funciones de utilidad', () => {
             assert.strictEqual(formatUnitPrice(16.8, '€'), '16,8000 €');
             assert.strictEqual(formatUnitPrice(0.12345, '$'), '0,1235 $');
             assert.strictEqual(formatUnitPrice(0, '£'), '0,0000 £');
+        });
+    });
+
+    describe('formatTitleCase', () => {
+        it('aplica al escandallo la misma capitalización tipo título que la despensa', () => {
+            assert.strictEqual(formatTitleCase('aceite de oliva virgen extra'), 'Aceite de Oliva Virgen Extra');
+            assert.strictEqual(formatTitleCase('carrillera de cerdo ibérico limpia'), 'Carrillera de Cerdo Ibérico Limpia');
+            assert.strictEqual(formatTitleCase('sal y pimienta'), 'Sal y Pimienta');
+            assert.strictEqual(formatTitleCase('  carrillera   cerdo  '), 'Carrillera Cerdo');
+            assert.strictEqual(formatTitleCase('nata culinaria 35% M.G.'), 'Nata Culinaria 35% M.G.');
+            assert.strictEqual(formatTitleCase('sub-receta / base'), 'Sub-Receta / Base');
+            assert.strictEqual(formatTitleCase(''), '');
         });
     });
 

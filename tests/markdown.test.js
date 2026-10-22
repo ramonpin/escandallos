@@ -35,7 +35,7 @@ describe('Generación y parseo de Markdown para Obsidian', () => {
             assert.match(md, /> \[!info\] Conservación, Vacío y Control APPCC/);
 
             // Wikilinks en la tabla de ingredientes
-            assert.match(md, /\| \[\[Carrillera de Cerdo Ibérico limpia\]\] \|/);
+            assert.match(md, /\| \[\[Carrillera de Cerdo Ibérico Limpia\]\] \|/);
             assert.match(md, /\| \[\[Vino Oporto Ruby\]\] \|/);
 
             // Tabla de totales
@@ -203,7 +203,9 @@ Servir inmediatamente o mantener en pase a 60°C.
 
             assert.deepStrictEqual(parsed.allergens, ['pescado']);
             assert.strictEqual(parsed.ingredients.length, 3);
-            assert.strictEqual(parsed.ingredients[0].name, 'Lomo de bacalao desalado');
+            assert.strictEqual(parsed.ingredients[0].name, 'Lomo de Bacalao Desalado');
+            assert.strictEqual(parsed.ingredients[1].name, 'Aceite de Oliva Virgen Extra');
+            assert.strictEqual(parsed.ingredients[2].name, 'Dientes de Ajo y Guindilla');
             assert.strictEqual(parsed.ingredients[0].grossQty, 0.8);
             assert.strictEqual(parsed.ingredients[0].wastePct, 5);
             assert.strictEqual(parsed.ingredients[0].unitPrice, 18.00);
