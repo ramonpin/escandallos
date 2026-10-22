@@ -24,7 +24,7 @@
          * Decimales visibles para los campos numéricos de los ingredientes.
          * Se usan tanto al renderizar como al formatear tras editar.
          */
-        const INGREDIENT_FIELD_DECIMALS = { grossQty: 3, wastePct: 1, unitPrice: 2 };
+        const INGREDIENT_FIELD_DECIMALS = { grossQty: 3, wastePct: 1, unitPrice: 4 };
 
         /**
          * Universal ID generator with fallback for non-secure contexts (file:// protocol)
@@ -121,6 +121,21 @@
 
         function formatCurrency(num, symbol = state.currencySymbol) {
             return `${formatNumber(num, 2)} ${symbol}`;
+        }
+
+        /**
+         * Precio unitario de compra: se muestra y exporta con cuatro decimales.
+         * El resto de importes (coste real, coste total, PVP, márgenes) usan dos.
+         */
+        function formatUnitPrice(num, symbol = state.currencySymbol) {
+            return `${formatNumber(num, INGREDIENT_FIELD_DECIMALS.unitPrice)} ${symbol}`;
+        }
+
+        function roundTo(value, decimals) {
+            const num = typeof value === 'number' ? value : parseLocaleFloat(value);
+            if (!Number.isFinite(num)) return 0;
+            const factor = Math.pow(10, decimals);
+            return Math.round((num + Number.EPSILON) * factor) / factor;
         }
 
         /**
@@ -332,7 +347,7 @@
                 const displayName = targetState.optWikiLinks ? `[[${cleanForWiki}]]` : escapeMdCell(rawName);
                 const weightShare = totals.totalCost > 0 ? (ing.totalCost / totals.totalCost) * 100 : 0;
 
-                md += `| ${idx + 1} | ${displayName} | ${formatNumber(ing.gross, 3)} | ${escapeMdCell(ing.unit)} | ${formatNumber(ing.waste, 1)}% | ${formatNumber(ing.netQty, 3)} | ${formatCurrency(ing.price, sym)} | ${formatCurrency(ing.effectiveUnitPrice, sym)} | **${formatCurrency(ing.totalCost, sym)}** | ${formatNumber(weightShare, 1)}% |\n`;
+                md += `| ${idx + 1} | ${displayName} | ${formatNumber(ing.gross, 3)} | ${escapeMdCell(ing.unit)} | ${formatNumber(ing.waste, 1)}% | ${formatNumber(ing.netQty, 3)} | ${formatUnitPrice(ing.price, sym)} | ${formatCurrency(ing.effectiveUnitPrice, sym)} | **${formatCurrency(ing.totalCost, sym)}** | ${formatNumber(weightShare, 1)}% |\n`;
             });
 
             md += `| | **TOTALES** | | | | **${weightFormatted}** | | | **${formatCurrency(totals.totalCost, sym)}** | **100%** |\n\n`;
@@ -955,7 +970,7 @@
                         grossQty: grossQty || 0.1,
                         unit: unit || 'kg',
                         wastePct: wastePct || 0,
-                        unitPrice: unitPrice || 0
+                        unitPrice: roundTo(unitPrice || 0, INGREDIENT_FIELD_DECIMALS.unitPrice)
                     });
                 }
             }
@@ -1197,9 +1212,9 @@
 
                 opt.value = `${name}|${unit}|${gross}|${waste}|${price}`;
 
-                let label = `${name} (${formatNumber(price, 2)} ${sym}/${unit})`;
+                let label = `${name} (${formatNumber(price, INGREDIENT_FIELD_DECIMALS.unitPrice)} ${sym}/${unit})`;
                 if (waste > 0) {
-                    label = `${name} (${formatNumber(waste, 0)}% merma · ${formatNumber(price, 2)} ${sym}/${unit})`;
+                    label = `${name} (${formatNumber(waste, 0)}% merma · ${formatNumber(price, INGREDIENT_FIELD_DECIMALS.unitPrice)} ${sym}/${unit})`;
                 }
                 opt.textContent = label;
                 return opt;
@@ -1326,7 +1341,7 @@
                     unit,
                     grossQty: parseFloat(grossQty),
                     wastePct: parseFloat(wastePct),
-                    unitPrice: parseFloat(unitPrice)
+                    unitPrice: roundTo(parseFloat(unitPrice), INGREDIENT_FIELD_DECIMALS.unitPrice)
                 });
                 e.target.value = '';
                 renderIngredientsTable();
@@ -1407,6 +1422,9 @@
                 escapeHtml,
                 formatNumber,
                 formatCurrency,
+                formatUnitPrice,
+                roundTo,
+                INGREDIENT_FIELD_DECIMALS,
                 parseLocaleFloat,
                 computeIngredientMetrics,
                 computeRecipeTotals,

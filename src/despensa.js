@@ -28,7 +28,7 @@ const SUGGESTED_CATEGORIES = [
     'Congelados'
 ];
 
-const NUMERIC_FIELDS = { grossQty: 3, wastePct: 2, unitPrice: 2 };
+const NUMERIC_FIELDS = { grossQty: 3, wastePct: 2, unitPrice: 4 };
 
 let items = [];
 let visibleEntries = [];
@@ -175,7 +175,7 @@ function normalizeItem(raw) {
         unit: normalizeUnit(src.unit),
         grossQty: hasGross ? parseLocaleFloat(src.grossQty) : 0.1,
         wastePct: hasWaste ? parseLocaleFloat(src.wastePct) : 0,
-        unitPrice: hasPrice ? parseLocaleFloat(src.unitPrice) : 0
+        unitPrice: hasPrice ? roundTo(parseLocaleFloat(src.unitPrice), NUMERIC_FIELDS.unitPrice) : 0
     };
 }
 
@@ -186,7 +186,7 @@ function toExportItem(item) {
         unit: normalizeUnit(item.unit),
         grossQty: roundTo(parseLocaleFloat(item.grossQty), 3),
         wastePct: roundTo(parseLocaleFloat(item.wastePct), 2),
-        unitPrice: roundTo(parseLocaleFloat(item.unitPrice), 2)
+        unitPrice: roundTo(parseLocaleFloat(item.unitPrice), NUMERIC_FIELDS.unitPrice)
     };
 }
 
@@ -1096,7 +1096,7 @@ function onGridFocusOut(event) {
     const field = el.dataset.field;
 
     if (NUMERIC_FIELDS[field] !== undefined) {
-        const value = parseLocaleFloat(el.value);
+        const value = roundTo(parseLocaleFloat(el.value), NUMERIC_FIELDS[field]);
         item[field] = value;
         el.value = displayFieldValue(field, value);
     } else if (field === 'name' || field === 'categoria') {

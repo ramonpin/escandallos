@@ -3,6 +3,8 @@ const assert = require('node:assert/strict');
 const {
     formatNumber,
     formatCurrency,
+    formatUnitPrice,
+    INGREDIENT_FIELD_DECIMALS,
     parseLocaleFloat,
     escapeYaml,
     escapeMdCell,
@@ -49,6 +51,15 @@ describe('Formateo, sanitización y funciones de utilidad', () => {
             assert.strictEqual(formatCurrency(16.8, '€'), '16,80 €');
             assert.strictEqual(formatCurrency(24.5, '$'), '24,50 $');
             assert.strictEqual(formatCurrency(0, '£'), '0,00 £');
+        });
+    });
+
+    describe('formatUnitPrice', () => {
+        it('presenta los precios unitarios con cuatro decimales', () => {
+            assert.strictEqual(INGREDIENT_FIELD_DECIMALS.unitPrice, 4);
+            assert.strictEqual(formatUnitPrice(16.8, '€'), '16,8000 €');
+            assert.strictEqual(formatUnitPrice(0.12345, '$'), '0,1235 $');
+            assert.strictEqual(formatUnitPrice(0, '£'), '0,0000 £');
         });
     });
 

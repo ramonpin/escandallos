@@ -78,6 +78,27 @@ describe('Generación y parseo de Markdown para Obsidian', () => {
             assert.match(md, /\| Merluza de pincho \|/);
         });
 
+        it('exporta e importa los precios unitarios con cuatro decimales sin alterar el resto de importes', () => {
+            const customState = {
+                ...getDemoState(),
+                recipeName: 'Prueba de precisión',
+                ingredients: [
+                    { id: '1', name: 'Insumo de precisión', grossQty: 1, unit: 'kg', wastePct: 10, unitPrice: 12.3456 }
+                ]
+            };
+
+            const md = generateObsidianMarkdown(computeRecipeTotals(customState), customState);
+
+            // El precio unitario de compra conserva cuatro decimales.
+            assert.match(md, /\| 12,3456 € \|/);
+            // El coste real por unidad neta y el coste total se mantienen con dos decimales.
+            assert.match(md, /\| 13,72 € \|/);
+            assert.match(md, /\*\*12,35 €\*\*/);
+
+            const parsed = parseMarkdownEscandallo(md);
+            assert.strictEqual(parsed.ingredients[0].unitPrice, 12.3456);
+        });
+
         it('refleja adecuadamente recetas sin alérgenos', () => {
             const stateSinAlergenos = {
                 ...getDemoState(),

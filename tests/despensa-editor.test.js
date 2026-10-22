@@ -59,17 +59,34 @@ describe('Editor de despensa: normalización y validación', () => {
             unit: 'L',
             grossQty: 0.08,
             wastePct: 0,
-            unitPrice: 9.2
+            unitPrice: 9.2345
         }]);
 
         const parsed = JSON.parse(json);
         assert.deepEqual(Object.keys(parsed[0]), ['categoria', 'name', 'unit', 'grossQty', 'wastePct', 'unitPrice']);
-        assert.equal(parsed[0].unitPrice, 9.2);
+        assert.equal(parsed[0].unitPrice, 9.2345);
+        assert.match(json, /"unitPrice": 9\.2345/);
         assert.match(json, /^\s*\[/);
     });
 
+    it('redondea el precio unitario a cuatro decimales al exportar y conserva el resto de precisiones', () => {
+        const exported = editor.toExportItem({
+            categoria: 'Carnes',
+            name: 'Pollo',
+            unit: 'kg',
+            grossQty: 1.23456,
+            wastePct: 12.345,
+            unitPrice: 5.67891
+        });
+
+        assert.equal(exported.grossQty, 1.235);
+        assert.equal(exported.wastePct, 12.35);
+        assert.equal(exported.unitPrice, 5.6789);
+    });
+
     it('muestra los campos numéricos con el mismo separador decimal español que los cálculos', () => {
-        assert.equal(editor.displayFieldValue('unitPrice', 1.5), '1,50');
+        assert.equal(editor.displayFieldValue('unitPrice', 1.5), '1,5000');
+        assert.equal(editor.displayFieldValue('unitPrice', 1.2345), '1,2345');
         assert.equal(editor.displayFieldValue('grossQty', 0.08), '0,080');
         assert.equal(editor.displayFieldValue('wastePct', 15), '15,00');
         assert.equal(editor.displayFieldValue('name', 'Cebolla'), 'Cebolla');
