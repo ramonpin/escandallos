@@ -526,5 +526,29 @@
     "grossQty": 1,
     "wastePct": 0.3,
     "unitPrice": 4.5
+  },
+  {
+    "categoria": "Bebidas",
+    "name": "Vino Blanco",
+    "unit": "L",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 1.5
+  },
+  {
+    "categoria": "Bebidas",
+    "name": "Vino Tinto",
+    "unit": "L",
+    "grossQty": 1,
+    "wastePct": 0,
+    "unitPrice": 1.5
+  },
+  {
+    "categoria": "Carnes y Aves",
+    "name": "Costillas Frescas Mak",
+    "unit": "kg",
+    "grossQty": 1,
+    "wastePct": 0.5,
+    "unitPrice": 7
   }
 ]
