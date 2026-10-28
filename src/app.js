@@ -1896,9 +1896,31 @@ function updatePantryClearButton() {
   button.classList.toggle("hidden", input.value.length === 0);
 }
 
+function focusIngredientField(ingredientId, field = "grossQty") {
+  if (!ingredientId) return;
+
+  requestAnimationFrame(() => {
+    const isMobile = window.innerWidth < 768;
+    const root = document.querySelector(
+      isMobile ? "#ingredientsMobileList" : "#ingredientsTableBody",
+    );
+    if (!root) return;
+
+    const block = Array.from(root.querySelectorAll("[data-id]")).find(
+      (el) => el.dataset.id === ingredientId,
+    );
+    const target = block?.querySelector(`[data-field="${field}"]`);
+    if (!target) return;
+
+    target.focus({ preventScroll: true });
+    if (typeof target.select === "function") target.select();
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
 function addPantryItemToRecipe(rawItem) {
   const item = normalizePantryItem(rawItem);
-  if (!item) return false;
+  if (!item) return null;
 
   const existing = state.ingredients.find((ing) => (
     foldText(ing.name) === foldText(item.name) &&
@@ -1906,50 +1928,46 @@ function addPantryItemToRecipe(rawItem) {
   ));
 
   if (existing) {
-    const nextGross = roundTo(
-      Math.max(0, parseLocaleFloat(existing.grossQty)) + item.grossQty,
-      INGREDIENT_FIELD_DECIMALS.grossQty,
-    );
-    existing.grossQty = nextGross;
     showToast(
-      `«${item.name}» ya estaba en el escandallo. Cantidad incrementada a ${
-        formatNumber(nextGross, INGREDIENT_FIELD_DECIMALS.grossQty)
-      } ${item.unit}.`,
+      `«${item.name}» ya está en el escandallo. No se ha modificado la cantidad.`,
     );
-  } else {
-    state.ingredients.push({
-      id: generateId(),
-      name: item.name,
-      grossQty: item.grossQty,
-      unit: item.unit,
-      wastePct: item.wastePct,
-      unitPrice: item.unitPrice,
-    });
-    showToast(`Insumo «${item.name}» añadido al escandallo.`);
+    return existing.id;
   }
 
+  const newIngredient = {
+    id: generateId(),
+    name: item.name,
+    grossQty: item.grossQty,
+    unit: item.unit,
+    wastePct: item.wastePct,
+    unitPrice: item.unitPrice,
+  };
+  state.ingredients.push(newIngredient);
   renderIngredientsTable();
   recalculateAndSync();
-  return true;
+  showToast(`Insumo «${item.name}» añadido al escandallo.`);
+  return newIngredient.id;
 }
 
 function addFreeIngredientFromQuery(query) {
   const name = formatTitleCase(String(query ?? "").trim());
-  if (!name) return;
+  if (!name) return null;
 
-  state.ingredients.push({
+  const newIngredient = {
     id: generateId(),
     name,
     grossQty: 0.100,
     unit: "kg",
     wastePct: 0,
     unitPrice: 0,
-  });
+  };
+  state.ingredients.push(newIngredient);
   renderIngredientsTable();
   recalculateAndSync();
   showToast(
     `Ingrediente libre «${name}» añadido. Indica cantidad, unidad y precio.`,
   );
+  return newIngredient.id;
 }
 
 function focusPantrySearchWithoutOpening() {
@@ -1966,16 +1984,19 @@ function selectPantryResult(index) {
   const item = pantryVisibleResults[index];
   if (!item) return;
 
-  addPantryItemToRecipe(item);
-
+  const ingredientId = addPantryItemToRecipe(item);
   const input = document.getElementById("pantrySearchInput");
+
   if (input) {
     input.value = "";
     updatePantryClearButton();
-    closePantryResults();
-    focusPantrySearchWithoutOpening();
+  }
+  closePantryResults();
+
+  if (ingredientId) {
+    focusIngredientField(ingredientId);
   } else {
-    closePantryResults();
+    focusPantrySearchWithoutOpening();
   }
 }
 
@@ -2067,11 +2088,15 @@ function bindPantryPickerEvents() {
     }
     if (action === "create") {
       const query = actionEl.dataset.pantryQuery || input.value;
-      addFreeIngredientFromQuery(query);
+      const newIngredientId = addFreeIngredientFromQuery(query);
       input.value = "";
       updatePantryClearButton();
       closePantryResults();
-      focusPantrySearchWithoutOpening();
+      if (newIngredientId) {
+        focusIngredientField(newIngredientId);
+      } else {
+        focusPantrySearchWithoutOpening();
+      }
       return;
     }
     if (action === "select") {
@@ -2182,29 +2207,18 @@ function initApp() {
 
   // Helper function to add a new empty ingredient and focus it on active viewport
   const addEmptyIngredientLine = () => {
-    state.ingredients.push({
+    const newIngredient = {
       id: generateId(),
       name: "",
       grossQty: 0.100,
       unit: "kg",
       wastePct: 0,
       unitPrice: 0.00,
-    });
+    };
+    state.ingredients.push(newIngredient);
     renderIngredientsTable();
     recalculateAndSync();
-
-    const isMobile = window.innerWidth < 768;
-    const selector = isMobile
-      ? '#ingredientsMobileList input[data-field="name"]'
-      : '#ingredientsTableBody input[data-field="name"]';
-    const inputs = document.querySelectorAll(selector);
-    if (inputs.length > 0) {
-      inputs[inputs.length - 1].focus();
-      inputs[inputs.length - 1].scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
+    focusIngredientField(newIngredient.id);
   };
 
   document.getElementById("btnAddIngredient").addEventListener(

@@ -1286,7 +1286,7 @@ function addItem() {
   if (byId("sortSelect")) byId("sortSelect").value = "custom";
 
   renderAll();
-  focusItem(items.length - 1, "name");
+  focusItem(items.length - 1, "categoria");
   showToast(
     "Nuevo insumo añadido. Indica su categoría, nombre y datos.",
     "success",
